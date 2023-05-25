@@ -12,7 +12,7 @@ class Solution {
 
             double dxdy2 = getDxDy(d2, d3);
 
-            if (dxdy1/dxdy2==1)
+            if (dxdy1==dxdy2)
                 return 1;
         }
 
