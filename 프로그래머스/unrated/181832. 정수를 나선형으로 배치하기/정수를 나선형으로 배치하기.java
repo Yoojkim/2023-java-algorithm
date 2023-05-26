@@ -5,29 +5,24 @@ class Solution {
         int num=1;
         int minX=0; int maxX=n-1;
         int minY=0; int maxY=n-1;
-        int x=0; int y=0;
         while(num<=n*n){
             for (int i=minX; i<=maxX; i++){
-                x=i;
-                res[y][x]=num++;
+                res[minX][i]=num++;
             }
             minY+=1;
             
             for(int i=minY; i<=maxY; i++){
-                y=i;
-                res[y][x]=num++;
+                res[i][maxX]=num++;
             }
             maxX-=1;
             
             for(int i=maxX; i>=minX; i--){
-                x=i;
-                res[y][x]=num++;
+                res[maxY][i]=num++;
             }
             maxY-=1;
             
             for(int i=maxY; i>=minY; i--){
-                y=i;
-                res[y][x]=num++;
+                res[i][minX]=num++;
             }
             minX+=1;
         }
