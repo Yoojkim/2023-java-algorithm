@@ -23,25 +23,26 @@ public class Main{
         int ans=Integer.MAX_VALUE;
         while(true){
             if(sum>=s){
-                sum-=fields[low];
-                low++;
-            } else if(high==n){
-                break;
-            } else{
-                sum+=fields[high];
-                high++;
-            }
-              
-            if(sum>=s){
-                int len=high-1-low+1;
+                int len=high-low; //high-1-low+1
                 if(ans>len)
                     ans=len;
-            }
+                
+                sum-=fields[low];
+                low++;
+                
+                continue;
+            } 
+            
+            //종료
+            if(high==n)
+                break;
+            
+            sum+=fields[high];
+            high++;
         }
         
-        if(ans==Integer.MAX_VALUE){
+        if(ans==Integer.MAX_VALUE)
             ans=0;
-        }
         
         System.out.print(ans);
     }
