@@ -7,19 +7,24 @@ public class Main{
     static int[] fields;
     static int ans=0;
     
-    private static void cal(int idx, int sum){
-        if (sum==s){
-            ans++;
-            return;
+    private static void twoPointers(){
+        int low=0, high=0; 
+        int sum=0;
+        while(true){
+            
+            if(sum>=s){
+                sum-=fields[low];
+                low++;
+            } else if(high==n){
+                break;
+            } else{
+                sum+=fields[high];
+                high++;
+            }
+            
+            if(sum==s)
+                ans++;
         }
-        
-        if (sum>s)
-            return;
-        
-        if (idx==n)
-            return;
-       
-        cal(idx+1, sum+fields[idx]);
     }
     
     public static void main(String[] args) throws Exception{
@@ -34,9 +39,7 @@ public class Main{
             fields[i]=Integer.parseInt(arr[i]);
         }
         
-        for(int i=0;i<n;i++){
-            cal(i, 0);
-        }
+        twoPointers();
         
         System.out.print(ans);
     }
