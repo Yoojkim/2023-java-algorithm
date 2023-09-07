@@ -1,55 +1,50 @@
 import java.util.*;
 
-class Main {
-    static int ans = 0;
+class Main{
     static int n;
-    static boolean[][] board;
-
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        n = scanner.nextInt();
-        board = new boolean[n][n];
+    static int ans=0;
+    static int[] candidates;
+    
+    public static void main(String[] args){
+        Scanner scanner=new Scanner(System.in);
+        n=scanner.nextInt();
+        candidates=new int[n];
+        
         backTracking(0);
+        
         System.out.print(ans);
     }
-
-    private static void backTracking(int row) {
-        if (row == n) {
+    
+    private static void backTracking(int row){
+        if(row==n){
             ans++;
             return;
         }
-
-        for (int col = 0; col < n; col++) {
-            if (isPossible(row, col)) {
-                board[row][col] = true;
-                backTracking(row + 1);
-                board[row][col] = false;
+        
+        for(int j=0;j<n;j++){
+            if(isPossible(row, j)){
+                candidates[row]=j;
+                backTracking(row+1);
+                //candidates 재초기화 필요? ㄴㄴ 
             }
         }
     }
-
-    private static boolean isPossible(int row, int col) {
-        // Check column
-        for (int i = 0; i < row; i++) {
-            if (board[i][col]) {
+    
+    private static boolean isPossible(int row, int col){
+        for(int i=0;i<row;i++){
+            int tempCol=candidates[i];
+            
+            if (tempCol==col)
                 return false;
-            }
-        }
-
-        // Check upper-left diagonal
-        for (int i = row, j = col; i >= 0 && j >= 0; i--, j--) {
-            if (board[i][j]) {
+            
+            //대각선 계산
+            int dx=row-i; int dy=col-tempCol;
+            dx=(dx<0?dx*-1:dx); dy=(dy<0?dy*-1:dy);
+            
+            if(dx==dy)
                 return false;
-            }
         }
-
-        // Check upper-right diagonal
-        for (int i = row, j = col; i >= 0 && j < n; i--, j++) {
-            if (board[i][j]) {
-                return false;
-            }
-        }
-
+        
         return true;
     }
 }
