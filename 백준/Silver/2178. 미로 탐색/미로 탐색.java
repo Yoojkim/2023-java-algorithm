@@ -1,103 +1,52 @@
-import java.io.*;
 import java.util.*;
+import java.io.*;
 
-class Graph{
-    int n;
-    int m;
-    int[][] graph;
+class Main{
 
-    //초기화 시점 알기
-    int[][] addVars=new int[][]{
-            {-1, 0},
-            {1, 0},
-            {0, -1},
-            {0, 1}
+    static int[][] displacements={
+            {-1, 0}, {1, 0}, {0, -1}, {0, 1}
     };
 
-    Graph(int n, int m){
-        this.n=n;
-        this.m=m;
+    public static void main(String[] args) throws Exception{
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        //배열 생성
-        graph=new int[n][m]; //초기화 모두 0
-    }
+        String[] nums=br.readLine().split(" ");
+        int n=Integer.parseInt(nums[0]); int m=Integer.parseInt(nums[1]);
 
-    void setGraph(int[][] graph){
-        this.graph=graph;
-    }
+        int[][] arr=new int[n][m];
 
-    int bfs(){
+        for(int i=0;i<n;i++){
+            char[] row=br.readLine().toCharArray();
+            for(int j=0;j<m;j++){
+                arr[i][j]=row[j]-'0';
+            }
+        }
+
+        //o, o~n-1, m-1
         LinkedList<int[]> queue=new LinkedList();
-        int tryNum=0;
-        boolean keepGoing=true;
 
-        queue.add(new int[]{0, 0});
-        tryNum++;
+        int[] start={0, 0};
+        queue.addLast(start);
 
-        while(keepGoing) {
-            LinkedList<int[]> newQueue = new LinkedList();
+        while(!queue.isEmpty()){
+            int[] now=queue.poll();
 
-            for (int[] p : queue) {
-                if (this.visited(p, newQueue))
-                    keepGoing = false;
-            }
+            for(int[] dp:displacements){
+                int newI=now[0]+dp[0];
+                int newJ=now[1]+dp[1];
 
-            queue=newQueue;
-            tryNum++;
-        }
+                if(newI<0 || newI>=n || newJ<0 || newJ>=m)
+                    continue;
 
-            return tryNum;
+                if(arr[newI][newJ]==1){
+                    int[] coordinate={newI, newJ};
+                    queue.addLast(coordinate);
 
-    }
-
-    boolean visited(int[] point, LinkedList<int[]> queue){
-        int pn=point[0];
-        int pm=point[1];
-
-        for(int[] addVar: addVars){
-            int newPn=pn+addVar[0];
-            int newPm=pm+addVar[1];
-
-            if (newPn>=0 && newPn<n && newPm>=0 && newPm<m){
-                if(graph[newPn][newPm]==1){
-                    queue.add(new int[] {newPn, newPm});
-                    graph[newPn][newPm]++; //방문 완료 표시
-
-                    if(newPn==n-1 && newPm==m-1)
-                        return true; //특이사항: 종착지 방문
+                    arr[newI][newJ]=arr[now[0]][now[1]]+1;
                 }
             }
         }
 
-        return false; //특이사항 없음.
+        System.out.print(arr[n-1][m-1]);
     }
-
-    }
-
-    public class Main{
-        static public void main(String[] args) throws Exception{
-            BufferedReader bf=new BufferedReader(new InputStreamReader(System.in));
-            StringTokenizer st= new StringTokenizer(bf.readLine());
-
-            int n=Integer.parseInt(st.nextToken());
-            int m=Integer.parseInt(st.nextToken());
-
-            Graph graph=new Graph(n, m);
-
-            int[][] maze=new int[n][m];
-            for(int i=0;i<n;i++){
-                String[] words=bf.readLine().split("");
-
-                int j=0;
-                for(String word:words){
-                    maze[i][j++]=Integer.parseInt(word);
-                }
-
-            }
-
-            graph.setGraph(maze);
-            int tryNum=graph.bfs();
-
-            System.out.print(tryNum);
-        }
-    }
+}
