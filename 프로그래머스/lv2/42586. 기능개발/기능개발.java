@@ -2,37 +2,32 @@ import java.util.*;
 
 class Solution {
     public int[] solution(int[] progresses, int[] speeds) {
-        int dx=0;
         int n=progresses.length;
+        int[] remains=new int[n];
         
+        LinkedList<Integer> queue=new LinkedList();
         List<Integer> ans=new ArrayList();
-        while(dx<n){
-            for(int i=dx;i<n;i++){
-                progresses[i]=progresses[i]+speeds[i];
+        
+        for(int i=0;i<n;i++){
+            int date=(100-progresses[i])/speeds[i];
+            if((100-progresses[i])%speeds[i]>0)
+                date+=1;
+            
+            if(queue.isEmpty()){
+                queue.addLast(date);
+                continue;
+            } 
+            
+            if(queue.peek()<date){
+                ans.add(queue.size());
+                queue.clear();
             }
             
-            //배포 가능 확인
-            int cnt=0;
-            while(dx<n){
-                if(progresses[dx]>=100){
-                    dx++;
-                    cnt++;
-                } else{
-                    break;
-                }
-            }
-            
-            if(cnt>0)
-                ans.add(cnt);
-            
+            queue.addLast(date);
         }
         
-        int size=ans.size();
-        int[] arrayAns=new int[size];
-        for(int i=0;i<size;i++){
-            arrayAns[i]=ans.get(i);
-        }
+        ans.add(queue.size());
         
-        return arrayAns;
+        return ans.stream().mapToInt(i->i).toArray();
     }
 }
