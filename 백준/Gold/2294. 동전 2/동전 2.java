@@ -19,33 +19,22 @@ class Main{
 
         Collections.sort(ns);
 
-        dp(k);
-
-        System.out.print(d[k]);
-    }
-
-    private static int dp(int num){
-        if (num==0)
-            return 0;
-
-        int min=Integer.MAX_VALUE;
         for(int i=0;i<n;i++){
-            int newNum=num-ns.get(i);
+            for(int j=ns.get(i);j<=k;j++){
+                int newK=j-ns.get(i);
 
-            if(newNum<0)
-                break;
-
-            if(d[newNum]==0)
-                d[newNum]=dp(newNum);
-
-            if(d[newNum]>=0 && min>d[newNum])
-                min=d[newNum];
+                if((d[newK]==0 && newK==0) || d[newK]!=0){
+                    if(d[j]==0)
+                        d[j]=d[newK]+1;
+                    else{
+                        d[j]=(d[j]>d[newK]+1?d[newK]+1:d[j]);
+                    }
+                }
+            }
         }
 
-        if(min==Integer.MAX_VALUE)
-            return d[num]=-1;
-        else{
-            return d[num]=min+1;
-        }
+        int ans=(d[k]==0?-1:d[k]);
+
+        System.out.print(ans);
     }
 }
