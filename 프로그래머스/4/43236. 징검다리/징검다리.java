@@ -43,9 +43,9 @@ class Solution {
         }
         
         int lastDist=distance-min;
-        
         if((lastDist/section)>=1)
             sectionCnt++;
+            
         
         if(sectionCnt>=ansSection)
             return true;
