@@ -1,10 +1,10 @@
 # [level 4] 징검다리 - 43236 
 
-[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/43236) 
+[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/43236#qna) 
 
 ### 성능 요약
 
-메모리: 85.9 MB, 시간: 21.29 ms
+메모리: 88.5 MB, 시간: 31.88 ms
 
 ### 구분
 
@@ -16,7 +16,7 @@
 
 ### 제출 일자
 
-2023년 10월 1일 23:19:24
+2023년 10월 1일 23:39:48
 
 ### 문제 설명
 
