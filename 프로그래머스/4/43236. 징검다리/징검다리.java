@@ -28,7 +28,6 @@ class Solution {
         return ans;
     }
     
-    //이 부분 수정 필요 
     private boolean isPossible(int distance, int section, int[] rocks, int ansSection){
         int min=0;
         int sectionCnt=0;
