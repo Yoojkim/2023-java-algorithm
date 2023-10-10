@@ -21,18 +21,13 @@ class Main{
             ps[i]=p;
         }
 
+        int max=dp[0];
         for(int i=1;i<=n;i++){
-
-            //dp[i]와 dp[i-50] 까지의 최대
-            int max=-1;
-            for(int j=i;j>i-50;j--){
-                if(j==0)
-                    break;
-
-                if(max<dp[j])
-                    max=dp[j];
-            }
-
+            
+            //현재 dp[i]까지의 최댓값 계산
+            if(max<dp[i])
+                max=dp[i];
+            
             int exitDate=i+ts[i];
             int pSum=max+ps[i];
 
