@@ -32,22 +32,20 @@ public class Main{
             char[][] bd=new char[h][w];
 
             LinkedList<Point> queue=new LinkedList();
-            List<Point> peopleList=new ArrayList();
+            Point people=null;
             for(int i=0;i<h;i++){
                 char[] row=br.readLine().toCharArray();
                 for(int j=0;j<w;j++){
                     bd[i][j]=row[j];
 
                     if(row[j]=='@')
-                        peopleList.add(new Point(i, j, 0, true));
+                        people=new Point(i, j, 0, true);
                     if(row[j]=='*')
                         queue.addLast(new Point(i, j, 0, false));
                 }
             }
 
-            for(Point p:peopleList){
-                queue.addLast(p);
-            }
+            queue.addLast(people);
 
             int ans=getSeconds(queue, h, w, bd);
             if(ans<0)
@@ -78,8 +76,9 @@ public class Main{
 
                     if(bd[newI][newJ]=='.') {
                         queue.addLast(new Point(newI, newJ, sec + 1, true));
-                        bd[now.i][now.j]='*'; //visited 처리
-                        bd[newI][newJ]='*'; //visited 처리 
+                        
+                        //visited
+                        bd[newI][newJ]='@';
                     }
                 }
             }
