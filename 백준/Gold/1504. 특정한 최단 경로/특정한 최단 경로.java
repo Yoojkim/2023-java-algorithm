@@ -94,17 +94,20 @@ public class Main {
         int[] dist = new int[n + 1];
         Arrays.fill(dist, Integer.MAX_VALUE);
         PriorityQueue<Edge> queue = new PriorityQueue<>();
+        boolean[] visited = new boolean[n+1];
 
         dist[p1]=0;
+       
         queue.add(new Edge(p1, 0));
 
         while(!queue.isEmpty()){
             Edge now = queue.poll();
-
-            if(dist[now.point]<now.cost) {
+            
+            if(visited[now.point]){
                 continue;
             }
-
+            
+            visited[now.point]=true;
             dist[now.point]=now.cost;
 
             Nears nears = graph.get(now.point);
@@ -112,6 +115,7 @@ public class Main {
                 int newCost = now.cost+near.cost;
 
                 if(newCost<dist[near.point]){
+                    dist[near.point]=newCost;
                     queue.add(new Edge(near.point, newCost));
                 }
             }
