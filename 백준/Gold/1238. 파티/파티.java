@@ -1,17 +1,45 @@
 import java.util.*;
 import java.io.*;
 
-class Main {
+class Graph {
+    List<Node> nodes;
 
+    public Graph(int n) {
+        nodes = new ArrayList<>();
+        
+        for (int i = 0; i < n; i++) {
+            nodes.add(new Node());
+        }
+    }
+}
+
+class Node {
+    List<Edge> edges;
+
+    public Node() {
+        edges = new ArrayList<>();
+    }
+
+}
+
+class Edge{
+
+    int end;
+    int cost;
+
+    public Edge(int end, int cost) {
+        this.end = end;
+        this.cost = cost;
+    }
+}
+
+class Main {
     private static int N;
     private static int X;
     private static int INF = Integer.MAX_VALUE;
 
-    //graph
-    private static int[][] graph;
-
-
-    private static int max = Integer.MIN_VALUE;
+    private static Graph graph;
+    private static Graph reverseGraph;
 
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -21,7 +49,8 @@ class Main {
         int m = Integer.parseInt(st.nextToken());
         X = Integer.parseInt(st.nextToken());
 
-        graph = new int[N + 1][N + 1];
+        graph = new Graph(N+1);
+        reverseGraph = new Graph(N+1);
 
         for (int i = 0; i < m; i++) {
             st = new StringTokenizer(br.readLine());
@@ -29,60 +58,77 @@ class Main {
             int end = Integer.parseInt(st.nextToken());
             int cost = Integer.parseInt(st.nextToken());
 
-            graph[start][end] = cost;
+            graph.nodes.get(start).edges.add(new Edge(end, cost));
+            reverseGraph.nodes.get(end).edges.add(new Edge(start, cost));
         }
 
-        calMaxCost();
-        System.out.println(max);
+        int res = getMaxResult();
+        System.out.print(res);
     }
 
-    private static void calMaxCost() {
-        for (int i = 1; i <= N; i++) {
-            if (i == X) {
+    private static int getMaxResult(){
+        int max = Integer.MIN_VALUE;
+
+        // x -> n (return)
+        int[] dist = dijkstra(X, graph);
+
+        // n -> x (go)
+        int[] reverseDist = dijkstra(X, reverseGraph);
+
+        for(int i=1;i<=N;i++){
+            if(i==X){
                 continue;
             }
 
-            int goCost = dijkstra(i, X);
-            int returnCost = dijkstra(X, i);
+            int nodeCost = dist[i]+reverseDist[i];
 
-            if (goCost + returnCost > max) {
-                max = goCost + returnCost;
+            if(max<nodeCost){
+                max=nodeCost;
             }
         }
+
+        return max;
     }
 
-
-    private static int dijkstra(int start, int end) {
-        int dist[] = new int[N + 1]; //현재 start에서 각 마을까지 가는 최단 시간
+    private static int[] dijkstra(int start, Graph graph) {
+        int dist[] = new int[N + 1];
         Arrays.fill(dist, INF);
 
         PriorityQueue<int[]> queue = new PriorityQueue<>((d1, d2) -> Integer.compare(d1[1], d2[1]));
 
         dist[start] = 0;
-        int[] node = {start, 0};
-        queue.add(node);
+        queue.add(new int[]{start, 0});
+        boolean[] visited = new boolean[N + 1];
 
         while (!queue.isEmpty()) {
             int[] now = queue.poll();
-            int nowVillage = now[0];
+
+            int nextTown = now[0];
             int nowDist = now[1];
 
-            if (dist[nowVillage] > nowDist || nowDist >= dist[end]) continue;
+            if (visited[nextTown])
+                continue;
 
-            for (int i = 1; i <= N; i++) {
-                if (graph[nowVillage][i] == 0) continue;
+            visited[nextTown] = true;
+            dist[nextTown] = nowDist;
 
-                int newDist = nowDist + graph[nowVillage][i];
-                if (dist[i] <= newDist) {
+            //nextTown 값을 통해 계산하는 마을들과의 새로운 값들
+            for(Edge nextTownEdge:graph.nodes.get(nextTown).edges){
+                int newTownIdx = nextTownEdge.end;
+                if(visited[newTownIdx]){
                     continue;
                 }
 
-                dist[i] = newDist;
-                int[] newNode = {i, newDist};
-                queue.add(newNode);
+                int newDist = nowDist + nextTownEdge.cost;
+                if(dist[newTownIdx] <= newDist){
+                    continue;
+                }
+
+                queue.add(new int[]{newTownIdx, newDist});
             }
+
         }
 
-        return dist[end];
+        return dist;
     }
 }
