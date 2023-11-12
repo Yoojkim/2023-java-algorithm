@@ -1,126 +1,110 @@
 import java.io.*;
 import java.util.*;
 
-class Nears {
-
-    LinkedList<Edge> nears;
-
-    public Nears() {
-        nears = new LinkedList<>();
-    }
-
-    public void addNears(Edge edge) {
-        nears.add(edge);
-    }
-}
-
-class Edge implements Comparable<Edge>{
-    int point;
-    int cost;
-
-    public Edge(int point, int cost) {
-        this.point = point;
-        this.cost = cost;
-    }
-
-    public int compareTo(Edge e){
-        return this.cost-e.cost;
-    }
-}
 
 public class Main {
 
-    static List<Nears> graph = new LinkedList<>();
-    static int n;
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static StringBuilder sb = new StringBuilder();
+    static StringTokenizer st;
 
-    public static void main(String[] args) throws Exception {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        String[] inputs = br.readLine().split(" ");
+    static final int INF = Integer.MAX_VALUE;
 
-        n = Integer.parseInt(inputs[0]);
-        int m = Integer.parseInt(inputs[1]);
+    static class Info{
+        // 시작점 기준으로 idx 정점까지의 비용을 저장하는 class
+        // PrioirtyQueue에 사용
 
-        for (int i = 0; i <= n; i++) {
-            graph.add(new Nears());
+        int idx;
+        long dist;
+
+        Info(int _idx, long _dist) {
+            idx = _idx; dist = _dist;
         }
+    }
 
-        StringTokenizer st;
-        for (int j = 0; j < m; j++) {
+    static int[][] graph;
+    static int n, m, v1, v2;
+    static long[] minDist;
+
+    static void input() throws Exception{
+
+        st = new StringTokenizer(br.readLine());
+
+        n = Integer.parseInt(st.nextToken());
+        // 정점
+        m = Integer.parseInt(st.nextToken());
+        // 간선
+
+        graph = new int[n + 1][n + 1];
+
+        int u, v, w;
+        for (int i = 1; i <= m; i++) {
             st = new StringTokenizer(br.readLine());
-
-            int a = Integer.parseInt(st.nextToken());
-            int b = Integer.parseInt(st.nextToken());
-            int c = Integer.parseInt(st.nextToken());
-
-            graph.get(a).addNears(new Edge(b, c));
-            graph.get(b).addNears(new Edge(a, c));
+            u = Integer.parseInt(st.nextToken());
+            v = Integer.parseInt(st.nextToken());
+            w = Integer.parseInt(st.nextToken());
+            graph[u][v] = w;
+            graph[v][u] = w;
         }
 
         st = new StringTokenizer(br.readLine());
-        int p1 = Integer.parseInt(st.nextToken());
-        int p2 = Integer.parseInt(st.nextToken());
 
-        //1 -> p1 -> p2 -> n
-        int result1=getResultMinDist(p1, p2);
-
-        //1 -> p2 -> p1 -> n
-        int result2=getResultMinDist(p2, p1);
-
-        int result = (result1<result2)?result1:result2;
-
-        System.out.println(result);
+        v1 = Integer.parseInt(st.nextToken());
+        // 시작점
+        v2 = Integer.parseInt(st.nextToken());
+        // 도착점
     }
 
-    private static int getResultMinDist(int p1, int p2){
-        int[][] sequences = {
-            {1, p1}, {p1, p2}, {p2, n}
-        };
+    static long dijkstra(int start, int end) {
 
-        int sum=0;
-        for(int[] seq:sequences){
-            int dist = getMinDist(seq[0], seq[1]);
+        minDist = new long[n + 1];
+        for (int i = 1; i <= n; i++) minDist[i] = INF;
+        minDist[start] = 0;
 
-            if(dist==Integer.MAX_VALUE){
-                return -1;
-            }
+        PriorityQueue<Info> pq = new PriorityQueue<>((o1, o2) -> Long.compare(o1.dist, o2.dist));
+        pq.add(new Info(start, 0));
 
-            sum+=dist;
-        }
+        while (!pq.isEmpty()) {
 
-        return sum;
-    }
+            Info cur = pq.poll();
 
-    private static int getMinDist(int p1, int p2) {
-        int[] dist = new int[n + 1];
-        Arrays.fill(dist, Integer.MAX_VALUE);
-        PriorityQueue<Edge> queue = new PriorityQueue<>();
-        boolean[] visited = new boolean[n+1];
+            if (cur.dist > minDist[cur.idx]) continue;
+            for (int next = 1; next <= n; next++) {
+                if(graph[cur.idx][next] == 0) continue;
 
-        dist[p1]=0;
-       
-        queue.add(new Edge(p1, 0));
-
-        while(!queue.isEmpty()){
-            Edge now = queue.poll();
-            
-            if(visited[now.point]){
-                continue;
-            }
-            
-            visited[now.point]=true;
-            dist[now.point]=now.cost;
-
-            Nears nears = graph.get(now.point);
-            for(Edge near:nears.nears){
-                int newCost = now.cost+near.cost;
-
-                if(newCost<dist[near.point]){
-                    dist[near.point]=newCost;
-                    queue.add(new Edge(near.point, newCost));
+                if (minDist[next] > cur.dist + (long)graph[cur.idx][next]) {
+                    minDist[next] = cur.dist + (long)graph[cur.idx][next];
+                    pq.add(new Info(next, minDist[next]));
                 }
             }
         }
 
-        return dist[p2];
+        return minDist[end];
+    }
+
+    static void pro() {
+
+
+        long sum1, sum2;
+        sum2 = sum1 = 0;
+        sum1 += dijkstra(1, v1);
+        sum1 += dijkstra(v1, v2);
+        sum1 += dijkstra(v2, n);
+
+        sum2 += dijkstra(1, v2);
+        sum2 += dijkstra(v2, v1);
+        sum2 += dijkstra(v1, n);
+
+        long distSum = Math.min(sum1, sum2);
+        if (distSum >= INF) distSum = -1;
+        System.out.println(distSum);
+    }
+
+    public static void main(String[] args) throws Exception{
+
+        input();
+        pro();
+
     }
 }
+
