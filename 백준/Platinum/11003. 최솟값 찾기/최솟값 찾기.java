@@ -40,12 +40,10 @@ class Main{
     }
 
     private static void insert(Node A){
+        //queue의 맨 앞은 항상 작고 오래된 거
         if(!queue.isEmpty() && queue.peekFirst().index == A.index-L+1-1){
             queue.pollFirst();
         }
-//        if(queue.size() == L){
-//            queue.pollFirst();
-//        }
 
         while(!queue.isEmpty()){
             if(queue.peekLast().value < A.value){
