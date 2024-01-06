@@ -16,10 +16,7 @@ class Main {
 
     private static void hanoi(int start, int mid, int end, int section) {
         //종료조건
-        if (section == 1) {
-            sj.add(start + " " + end);
-            sum++;
-
+        if (section == 0) {
             return;
         }
 
