@@ -1,13 +1,13 @@
 import java.util.*;
 
 class Edge implements Comparable<Edge>{
-    int start;
-    int end;
+    int island1;
+    int island2;
     int cost;
     
-    public Edge(int start, int end, int cost){
-        this.start = start;
-        this.end = end;
+    public Edge(int island1, int island2, int cost){
+        this.island1 = island1;
+        this.island2 = island2;
         this.cost= cost;
     }
     
@@ -17,38 +17,28 @@ class Edge implements Comparable<Edge>{
 }
 
 class Solution {
+    
     public int solution(int n, int[][] costs) {
-        LinkedList<Edge>[] islands = new LinkedList[n];
-        for(int i=0;i<n;i++){
-            islands[i] = new LinkedList<>();
-        }
+        PriorityQueue<Edge> queue = new PriorityQueue<>();
         
         for(int[] cost:costs){
-            int start = cost[0]; int end = cost[1]; int value = cost[2];
-            
-            islands[start].add(new Edge(start, end, value));
-            islands[end].add(new Edge(end, start, value));
+            queue.add(new Edge(cost[0], cost[1], cost[2]));
         }
         
-        PriorityQueue<Edge> queue = new PriorityQueue<>();
         boolean[] visited = new boolean[n];
-        int count=0;
-        
-        int startIsland = 0;
-        visited[startIsland] = true;
-        queue.addAll(islands[startIsland]);
+        int result=0;
         while(!queue.isEmpty()){
             Edge newEdge = queue.poll();
             
-            if(visited[newEdge.end]){
+            if(visited[newEdge.island1] && visited[newEdge.island2]){
                 continue;
             }
             
-            visited[newEdge.end]=true;
-            count += newEdge.cost;
-            queue.addAll(islands[newEdge.end]);
+            visited[newEdge.island1] = true;
+            visited[newEdge.island2] = true;
+            result+= newEdge.cost;
         }
         
-        return count;
+        return result;
     }
 }
