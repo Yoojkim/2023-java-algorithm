@@ -3,54 +3,55 @@ import java.util.*;
 class Solution {
     public int solution(int distance, int[] rocks, int n) {
         
+        //정렬
         Arrays.sort(rocks);
-        int ansSection=rocks.length-n+1;
         
-        //Parametric search
-        int left=1; int right=distance;
-        int ans=distance;
-        while(left<=right){
-            int mid=(left+right)/2;
+        int min = 1;
+        int max = distance;
+        
+        int res = 1;
+        while(min<=max){
+            int mid = (min+max)/2;
             
-            if((distance/mid)<ansSection){
-                right=mid-1;
+            if(isPossible(mid, distance, rocks ,n)){
+                res = mid;
+                min = mid+1;
                 continue;
             }
             
-            if(isPossible(distance, mid, rocks, ansSection)){
-                left=mid+1;
-                ans=mid;
-            } else{
-                right=mid-1;
-            }
+                max = mid-1;
         }
         
-        return ans;
+        return res;
     }
     
-    private boolean isPossible(int distance, int section, int[] rocks, int ansSection){
-        int min=0;
-        int sectionCnt=0;
+    private boolean isPossible(int mid, int distance, int[] rocks, int n){
+        int start = 0;
+        int removeCnt = 0;
         
         for(int rock:rocks){
-            int dist=rock-min;
+            int dist = rock - start;
             
-            if((dist/section)<1)
+            if(dist >= mid){
+                start = rock;
                 continue;
+            }
             
-            sectionCnt++;
-            min=rock;
+            removeCnt ++;
         }
         
-        int lastDist=distance-min;
-        if((lastDist/section)>=1)
-            sectionCnt++;
-            
+        //todo: 이 부분 구현을 못하겠음 .. 
         
-        if(sectionCnt>=ansSection)
+        int distToDest = distance - start;
+
+        if(distToDest < mid){
+            removeCnt ++;
+        }
+        
+        if(removeCnt <= n){
             return true;
+        }
         
         return false;
     }
-    
 }
