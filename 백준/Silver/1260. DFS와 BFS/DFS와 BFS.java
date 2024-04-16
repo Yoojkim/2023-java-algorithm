@@ -1,113 +1,84 @@
 import java.util.*;
 import java.io.*;
 
-class Graph{
-    int n;
-    LinkedList<Integer> graph[];
+class Main{
 
-    public Graph(int n){
-        this.n=n;
-        graph=new LinkedList[n+1];
-        for(int i=0;i<n+1;i++){
-            graph[i]=new LinkedList();
+    static int n, v;
+    static LinkedList<Integer>[] arr;
+    static StringBuilder sb=new StringBuilder();
+
+    public static void main(String[] args)throws Exception{
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String[] nums=br.readLine().split(" ");
+
+        n=Integer.parseInt(nums[0]); int m=Integer.parseInt(nums[1]); v=Integer.parseInt(nums[2]);
+
+        arr=new LinkedList[n+1];
+        for(int i=0;i<=n;i++){
+            arr[i]=new LinkedList();
         }
+
+        for(int i=0; i<m; i++){
+            nums=br.readLine().split(" ");
+            int p1=Integer.parseInt(nums[0]); int p2=Integer.parseInt(nums[1]);
+
+            //입력값 오름차순으로
+            int idx1=0; int idx2=0;
+            for(;idx1<arr[p1].size();idx1++){
+                if(arr[p1].get(idx1)>p2)
+                    break;
+            }
+
+            for(;idx2<arr[p2].size();idx2++){
+                if(arr[p2].get(idx2)>p1)
+                    break;
+            }
+
+            arr[p1].add(idx1, p2); arr[p2].add(idx2, p1);
+        }
+
+        dfs();
+        bfs();
+
+        System.out.print(sb);
     }
 
-    void addEdge(int v, int w){
-        
-        //차례대로 맞는 곳에 넣기 
-        LinkedList<Integer> tempDist=graph[v];
-        
-        int idx;
-        for(idx=0;idx<tempDist.size();idx++){
-            if(tempDist.get(idx)>w) break;
-        }
-        
-        tempDist.add(idx,w);
-    }
-
-    void dfs(int v){
-        boolean [] visited=new boolean[n+1];
-
+    private static void dfs(){
+        //v에서 시작
+        boolean[] visited=new boolean[n+1];
         dfsUtil(v, visited);
+        sb.append("\n");
     }
 
-    void dfsUtil(int v, boolean[] visited){
-        System.out.print(v+" ");
-        visited[v]=true;
-        Iterator<Integer> it=graph[v].listIterator();
-        while(it.hasNext()){
-            int n=it.next();
+    private static void dfsUtil(int start, boolean[] visited){
+        visited[start]=true;
+        sb.append(start).append(" ");
 
-            if(!visited[n]){
-                dfsUtil(n,visited);
-            }
+        for(int near:arr[start]){
+            if(!visited[near])
+                dfsUtil(near, visited);
         }
     }
 
-    void bfs(int v){
-        boolean [] visited=new boolean[n+1];
-        LinkedList<Integer> queue=new LinkedList();
-        queue.addLast(v);
+    private static void bfs(){
+        LinkedList<Integer> queue=new LinkedList<>();
+        boolean[] visited=new boolean[n+1];
+
+        queue.add(v);
         visited[v]=true;
-        System.out.print(v+" ");
 
-        while(queue.size()!=0){
-            int n=queue.poll();
-            Iterator<Integer> it=graph[n].listIterator();
+        while(!queue.isEmpty()){
+            int now=queue.poll();
+            sb.append(now).append(" ");
 
-            while(it.hasNext()){
-                int gn=it.next();
-
-                if(!visited[gn]){
-                    visited[gn]=true;
-                    queue.add(gn);
-                    System.out.print(gn+" ");
+            for(int near:arr[now]){
+                if(!visited[near]){
+                    visited[near]=true;
+                    queue.add(near);
                 }
-
-            }
-
-        }
-
-        //queue
-        Iterator<Integer> qit=queue.listIterator();
-        while(qit.hasNext()){
-            int qn=qit.next();
-            System.out.print(v+" ");
-            visited[qn]=true;
-
-            Iterator<Integer> it=graph[qn].listIterator();
-            while(it.hasNext()){
-                int n=it.next();
-                if(!visited[n])
-                    queue.addLast(n);
             }
         }
-    }
-}
 
-public class Main{
-    public static void main(String[] args) throws Exception{
-        //본격적 수행 하는 부분
-
-        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(bf.readLine());
-        int n=Integer.parseInt(st.nextToken());
-        int m=Integer.parseInt(st.nextToken());
-        int v=Integer.parseInt(st.nextToken());
-        Graph graph=new Graph(n);
-
-        for(int i=0;i<m;i++){
-            StringTokenizer graphSt=new StringTokenizer(bf.readLine());
-            int m1=Integer.parseInt(graphSt.nextToken());
-            int m2=Integer.parseInt(graphSt.nextToken());
-            graph.addEdge(m1, m2);
-            graph.addEdge(m2, m1);
-        }
-
-        graph.dfs(v);
-        System.out.println();
-        graph.bfs(v);
-
+        sb.append("\n");
     }
 }
