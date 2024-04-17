@@ -1,71 +1,101 @@
 import java.util.*;
 import java.io.*;
 
-class Node implements Comparable<Node>{
-    int node;
+class Edge implements Comparable<Edge>{
+    int node1;
+    int node2;
     int cost;
-    
-    public Node(int node, int cost){
-        this.node=node;
+
+    public Edge(int node1, int node2, int cost){
+        this.node1=node1;
+        this.node2=node2;
         this.cost=cost;
     }
-    
-    public int compareTo(Node o){
-        //오름차순 this.node가 n.node보다 작아야
-        if(this.cost>o.cost){
-            return 1; //자리 바꾸기
-        }else if(this.cost==o.cost){
-            return 0; //유지 
-        }else{
-            return -1; //유지 
-        }
+
+    //오름차순
+    public int compareTo(Edge e){
+        if(this.cost<e.cost)
+            return -1;
+        else if(this.cost==e.cost)
+            return 0;
+        else
+            return 1;
     }
-    
 }
-public class Main{
+
+//Kruskal
+class Main{
+    static int n, m;
+
+    //간선 리스트
+    static List<Edge> edges=new ArrayList();
+    //부모 배열
+    static int[] parents;
+
+
     public static void main(String[] args) throws Exception{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         String[] nums=br.readLine().split(" ");
-        int n=Integer.parseInt(nums[0]);
-        int m=Integer.parseInt(nums[1]);
-        
-        LinkedList<Node>[] fields=new LinkedList[n+1];
-        boolean[] visited = new boolean[n+1];
+        n=Integer.parseInt(nums[0]); m=Integer.parseInt(nums[1]);
+
+        parents=new int[n+1];
+        //부모 배열 초기화(자기 자신으로)
         for(int i=0;i<=n;i++){
-            fields[i]=new LinkedList();
+            parents[i]=i;
         }
-        
+
+        //간선 생성
         for(int i=0;i<m;i++){
             nums=br.readLine().split(" ");
-            int n1=Integer.parseInt(nums[0]);
-            int n2=Integer.parseInt(nums[1]);
+            int node1=Integer.parseInt(nums[0]); int node2=Integer.parseInt(nums[1]);
             int cost=Integer.parseInt(nums[2]);
-            
-            LinkedList<Node> field1=fields[n1];
-            LinkedList<Node> field2=fields[n2];
-            
-            //양방향 
-            field1.addLast(new Node(n2, cost));
-            field2.addLast(new Node(n1, cost));
+
+            Edge edge=new Edge(node1, node2, cost);
+            edges.add(edge);
         }
-        
-        PriorityQueue<Node> queue=new PriorityQueue();
-        queue.add(new Node(1, 0));
+
+        //정렬
+        Collections.sort(edges);
+
+        int cnt=0;
         int sum=0;
-        while(!queue.isEmpty()){
-            Node node=queue.poll();
-            
-            if(visited[node.node])
+        //Edge cost 작은 순으로 Kruskal MST 수행
+        for(Edge edge:edges){
+
+            if(cnt==n-1)
+                break;
+
+            int node1=edge.node1; int node2= edge.node2;
+
+            if(find(node1)==find(node2))
                 continue;
-            
-            visited[node.node]=true;
-            sum+=node.cost;
-            
-            for(Node next:fields[node.node]){
-                queue.add(next);
-            }
+
+            //union
+            union(node2, node1);
+            sum+=edge.cost;
+            cnt++; //간선 추가(간선은 n-1개)
         }
+
+        System.out.print(sum);
+    }
+
+    private static int find(int node){
+        if(parents[node]==node)
+            return node;
+
+        return find(parents[node]);
+    }
+
+    private static void union(int node1, int node2){
+        //node2 하위의 모든 node들을 node1으로 이동
+        int p1=find(node1);
+        int p2=find(node2);
         
-        System.out.println(sum);
+        //root가 더 작은 값으로 이동
+        if(p1>p2)
+            parents[p2]=p1;
+        else
+            parents[p1]=p2;
+
     }
 }
