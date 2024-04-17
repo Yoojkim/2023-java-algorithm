@@ -1,52 +1,70 @@
 import java.util.*;
 import java.io.*;
 
-class Main{
-
-    static int[][] displacements={
-            {-1, 0}, {1, 0}, {0, -1}, {0, 1}
+class Point{
+    int x;
+    int y;
+    
+    public Point(int x, int y){
+        this.x=x;
+        this.y=y;
+    }
+}
+public class Main{
+    static int[][] dps = {
+        {-1, 0}, {1, 0}, {0, -1}, {0, 1}
     };
-
+    
     public static void main(String[] args) throws Exception{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
-        String[] nums=br.readLine().split(" ");
-        int n=Integer.parseInt(nums[0]); int m=Integer.parseInt(nums[1]);
-
-        int[][] arr=new int[n][m];
-
-        for(int i=0;i<n;i++){
-            char[] row=br.readLine().toCharArray();
-            for(int j=0;j<m;j++){
-                arr[i][j]=row[j]-'0';
+        String[] values = br.readLine().split(" ");
+        int N = Integer.parseInt(values[0]); int M = Integer.parseInt(values[1]);
+        
+        int[][] maze = new int[N][M];
+        
+        for(int i=0;i<N;i++){
+            char[] row = br.readLine().toCharArray();
+            for(int j=0;j<M;j++){
+                maze[i][j]=row[j]-'0';
             }
         }
-
-        //o, o~n-1, m-1
-        LinkedList<int[]> queue=new LinkedList();
-
-        int[] start={0, 0};
-        queue.addLast(start);
-
+        
+        Queue<Point> queue = new LinkedList<>();
+        int turn=0;
+        queue.add(new Point(0, 0));
         while(!queue.isEmpty()){
-            int[] now=queue.poll();
-
-            for(int[] dp:displacements){
-                int newI=now[0]+dp[0];
-                int newJ=now[1]+dp[1];
-
-                if(newI<0 || newI>=n || newJ<0 || newJ>=m)
-                    continue;
-
-                if(arr[newI][newJ]==1){
-                    int[] coordinate={newI, newJ};
-                    queue.addLast(coordinate);
-
-                    arr[newI][newJ]=arr[now[0]][now[1]]+1;
+            turn++;
+            
+            Queue<Point> newQueue = new LinkedList<>();
+            while(!queue.isEmpty()){
+                Point now = queue.poll();
+                
+                if(now.x == N-1 && now.y == M-1){
+                    System.out.println(turn);
+                    
+                    return;
+                }
+                
+                maze[now.x][now.y] = 2;
+                
+                for(int[] dp:dps){
+                    int newX = now.x+dp[0];
+                    int newY = now.y+dp[1];
+                    
+                    if(newX<0 || newX>=N || newY<0 || newY>=M){
+                        continue;
+                    }
+                    
+                   if(maze[newX][newY]!=1){
+                       continue;
+                   }
+                    
+                   maze[newX][newY] = 2;
+                   newQueue.add(new Point(newX, newY));
                 }
             }
+            
+            queue = newQueue;
         }
-
-        System.out.print(arr[n-1][m-1]);
     }
 }
