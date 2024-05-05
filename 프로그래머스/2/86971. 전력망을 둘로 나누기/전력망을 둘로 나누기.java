@@ -2,61 +2,57 @@ import java.util.*;
 
 class Solution {
     public int solution(int n, int[][] wires) {
-        
-        LinkedList<Integer>[] nodes = new LinkedList[n+1];
-        for(int i=1;i<=n;i++){
-            nodes[i]=new LinkedList<>();
+        List<Integer>[] graph = new List[n+1];
+        for(int i=0;i<n+1;i++){
+            graph[i] = new ArrayList<>();
         }
         
         for(int[] wire:wires){
-            int n1 = wire[0];
-            int n2 = wire[1];
+            int a = wire[0];
+            int b = wire[1];
             
-            nodes[n1].add(n2);
-            nodes[n2].add(n1);
+            graph[a].add(b);
+            graph[b].add(a);
         }
         
-        int min = Integer.MAX_VALUE;
+        int diff = Integer.MAX_VALUE;
         for(int[] wire:wires){
-            int n1 = wire[0];
-            int n2 = wire[1];
+            int a = wire[0];
+            int b = wire[1];
             
-            int n1Count = countLink(n, n1, n2, nodes);
-            int n2Count = n-n1Count;
+            int aBfs = bfs(graph, a, b, n);
+            int bBfs = bfs(graph, b, a, n);
             
-            int gap=n1Count-n2Count;
-            gap=(gap<0)?gap*-1:gap;
+            int diffAB = Math.abs(aBfs-bBfs);
             
-            if(min>gap){
-                min=gap;
-            }
+            diff = diff>diffAB?diffAB:diff;
         }
         
-        return min;
+        return diff;
     }
     
-    private int countLink(int n, int start, int exception, LinkedList<Integer>[] nodes){
-        LinkedList<Integer> queue = new LinkedList<>();
+    private int bfs(List<Integer>[] graph, int start, int except, int n){
         boolean[] visited = new boolean[n+1];
+        Queue<Integer> queue = new LinkedList<>();
+        
         queue.add(start);
-        visited[exception] = true;
-        
-        int cnt=0;
-        
+        visited[start] = true;
+        visited[except] = true;
+        int count = 1;
         while(!queue.isEmpty()){
-            cnt++;
-            int node = queue.poll();
-            visited[node]=true;
+            int now = queue.poll();
             
-            for(int next:nodes[node]){
-                if(visited[next]){
+            for(int near: graph[now]){
+                if(visited[near]){
                     continue;
                 }
                 
-                queue.add(next);
+                visited[near] = true;
+                queue.add(near);
+                count++;
             }
         }
         
-        return cnt;
+        return count;
     }
 }
