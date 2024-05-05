@@ -21,7 +21,7 @@ class Solution {
             int b = wire[1];
             
             int aBfs = bfs(graph, a, b, n);
-            int bBfs = bfs(graph, b, a, n);
+            int bBfs = n-aBfs;
             
             int diffAB = Math.abs(aBfs-bBfs);
             
