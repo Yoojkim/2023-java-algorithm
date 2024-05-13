@@ -48,9 +48,6 @@ public class Main{
 
         //앞, 뒤
         if(size>=2){
-            int frontDiff = Math.abs(trees.get(0) - trees.get(1));
-            max = max<frontDiff?frontDiff:max;
-
             int backDiff = Math.abs(trees.get(size-2) - trees.get(size-1));
             max = max<backDiff?backDiff:max;
         }
