@@ -5,55 +5,46 @@ class Main{
     public static void main(String[] args) throws Exception{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        String[] nums=br.readLine().split(" ");
-        int k=Integer.parseInt(nums[0]); int n=Integer.parseInt(nums[1]);
+        String[] values = br.readLine().split(" ");
+        int K = Integer.parseInt(values[0]);
+        int N = Integer.parseInt(values[1]);
 
-        long[] ks=new long[k];
-        for(int i=0;i<k;i++){
-            ks[i]=Long.parseLong(br.readLine());
-        }
-
-        Arrays.sort(ks);
-
-        long left=1; long right=(ks[k-1]*k)/n;
-        long ans=-1;
-
-        while(left<=right){
-            long mid=(left+right)/2;
-
-            if(isPossible(ks, mid, n)){
-
-                if(ans<mid)
-                    ans=mid;
-
-                left=mid+1;
-
-            } else {
-                right=mid-1;
+        List<Integer> ks = new ArrayList<>();
+        int maxK = Integer.MIN_VALUE;
+        while(K-->0){
+            int k = Integer.parseInt(br.readLine());
+            if(maxK<k){
+                maxK = k;
             }
+
+            ks.add(k);
         }
 
-        System.out.print(ans);
+        long min = 1; long max = maxK;
+        long res = -1;
+        while(min<=max){
+            long mid = (min+max)/2;
+
+            int count = count(ks, mid);
+
+            if(count < N){
+                max = mid -1;
+                continue;
+            }
+
+            res = mid;
+            min = mid+1;
+        }
+
+        System.out.print(res);
     }
 
-    private static boolean isPossible(long[] ks, long size, int n){
-        
-        
-        for(int i=ks.length-1; i>=0; i--){
-            long cnt= ks[i]/size;
-            
-            if(n<cnt)
-                n=0;
-            else
-                n-=cnt;
-
-            if(n<=0)
-                break;
+    private static int count(List<Integer> ks, long mid){
+        int count =0;
+        for(int k:ks){
+            count+=(k/mid);
         }
 
-        if(n>0)
-            return false;
-
-        return true;
+        return count;
     }
 }
