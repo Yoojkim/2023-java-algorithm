@@ -4,27 +4,20 @@ import java.io.*;
 class Main{
     public static void main(String[] args) throws Exception{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
-        int n=Integer.parseInt(br.readLine());
-        int[] ns=new int[n+1];
-        for(int i=1;i<=n;i++){
-            ns[i]=Integer.parseInt(br.readLine());
+        
+        int N = Integer.parseInt(br.readLine());
+        int[][] dp = new int[N+1][2];
+        
+        int dp1 = Integer.parseInt(br.readLine());
+        dp[1][0] = dp1;
+        
+        for(int i=2;i<=N;i++){
+            //0: i-1 밟x 1: 밟음
+            int value = Integer.parseInt(br.readLine());
+            dp[i][0] = Math.max(dp[i-2][0], dp[i-2][1]) + value;
+            dp[i][1] = dp[i-1][0] + value;
         }
-
-        int[] d=new int[n+1];
         
-        d[1]=ns[1]; 
-        
-        //크기 봐서 해줌
-        if(n>=2) 
-            d[2]=d[1]+ns[2];
-        
-        for(int i=3;i<=n;i++){
-            //1. 이전 단계를 밟는 경우 d[i-3]+ns[i-1]+ns[i]
-            //2. 이전 단계를 밟지 않는 경우 d[i-2]+ns[i]
-            d[i]=Math.max(d[i-3]+ns[i-1]+ns[i], d[i-2]+ns[i]);
-        }
-
-        System.out.print(d[n]);
+        System.out.print(Math.max(dp[N][0], dp[N][1]));
     }
 }
