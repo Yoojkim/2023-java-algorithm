@@ -14,9 +14,9 @@ class Main{
         }
 
         for(int i=3;i<=N;i++){
-            dp[i] = dp[i-2] % 15746 +dp[i-1] % 15746;
+            dp[i] = (dp[i-2]+dp[i-1]) % 15746;
         }
 
-        System.out.print(dp[N] % 15746);
+        System.out.print(dp[N]);
     }
 }
