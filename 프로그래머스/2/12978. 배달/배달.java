@@ -1,89 +1,68 @@
 import java.util.*;
 
-class Roads{
-    List<Road> roads;
-    
-    public Roads(){
-        roads = new ArrayList<>();
-    }
-    
-    public void addRoad(Road road){
-        roads.add(road);
-    }
-}
-
 class Road implements Comparable<Road>{
+    int start;
     int end;
-    int cost;
+    int weight;
     
-    public Road(int end, int cost){
+    public Road(int start, int end, int weight){
+        this.start = start;
         this.end=end;
-        this.cost=cost;
+        this.weight= weight;
     }
     
-    public int compareTo(Road r){
-        return this.cost - r.cost;
+    public int compareTo(Road road){
+        return Integer.compare(this.weight, road.weight);
     }
 }
 
 class Solution {
     public int solution(int N, int[][] road, int K) {
-        Roads[] towns = new Roads[N+1];
-        for(int i=0;i<=N;i++){
-            towns[i] = new Roads();
+        
+        ArrayList<Road>[] towns = new ArrayList[N+1];
+        for(int i=1;i<=N;i++){
+            towns[i] = new ArrayList<>();
         }
         
         for(int[] r:road){
-            int start = r[0];
-            int end = r[1];
-            int cost = r[2];
+            int a = r[0];
+            int b = r[1];
+            int c = r[2];
             
-            towns[start].addRoad(new Road(end, cost));
-            towns[end].addRoad(new Road(start, cost));
+            towns[a].add(new Road(a, b, c));
+            towns[b].add(new Road(b, a, c));
         }
         
-        int[] dists = dijkstra(N, towns);
-        
-        int count=0;
-        for(int dist:dists){
-            if(K>=dist){
-                count++;
-            }
-        }
-        
-        return count;
-    }
-    
-    private int[] dijkstra(int n, Roads[] towns){
-        int[] dist = new int[n+1];
-        boolean[] visited = new boolean[n+1];
-        Arrays.fill(dist, Integer.MAX_VALUE);
-        dist[1]=0;
-        
+        int[] res = new int[N+1];
+        boolean[] visited = new boolean[N+1];
+        //1에서 시작
         PriorityQueue<Road> queue = new PriorityQueue<>();
         
-        queue.add(new Road(1, 0));
+        queue.add(new Road(1, 1, 0));
         while(!queue.isEmpty()){
-            Road min = queue.poll();
-            int next = min.end;
+            Road queueRoad = queue.poll();
             
-            if(visited[next]){
+            if(visited[queueRoad.end]){
                 continue;
             }
-                
-            visited[next] = true;
-            for(Road road:towns[next].roads){
-                int newCost = road.cost + dist[next];
-                
-                if(dist[road.end]<=newCost){
-                    continue;
-                }
-                
-                dist[road.end]=newCost;
-                queue.add(new Road(road.end, newCost));
+            
+            res[queueRoad.end] = queueRoad.weight;
+            visited[queueRoad.end] = true;
+            
+            for(Road newRoad:towns[queueRoad.end]){
+                queue.add(new Road(1, newRoad.end, queueRoad.weight+newRoad.weight));
             }
         }
         
-        return dist;
+        int cnt=0;
+        for(int i=1;i<=N;i++){
+            if(res[i] > K){
+                continue;
+            }
+            
+            cnt++;
+        }
+        
+        return cnt;
     }
 }
