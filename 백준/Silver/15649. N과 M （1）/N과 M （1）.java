@@ -4,7 +4,7 @@ import java.util.*;
 public class Main{
     static int N;
     static int M;
-    static StringJoiner mainSj = new StringJoiner("\n");
+    static StringBuilder sb = new StringBuilder();
     static boolean[] visited;
     
     public static void main(String[] args) throws Exception{
@@ -17,17 +17,17 @@ public class Main{
         
         int[] ans = new int[M];
         backTracking(0, ans);
-        System.out.print(mainSj);
+        System.out.print(sb);
     }
     
     public static void backTracking(int depth, int[] ans){
         if(depth == M){
             StringJoiner sj = new StringJoiner(" ");
             for(int val:ans){
-                sj.add(Integer.toString(val));
+                sb.append(val).append(" ");
             }
             
-            mainSj.add(sj.toString());
+            sb.append("\n");
             
             return;
         }
