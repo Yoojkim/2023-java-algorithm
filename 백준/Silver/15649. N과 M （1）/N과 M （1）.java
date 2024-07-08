@@ -5,7 +5,6 @@ public class Main{
     static int N;
     static int M;
     static StringJoiner mainSj = new StringJoiner("\n");
-    static Stack<Integer> stack = new Stack<>();
     static boolean[] visited;
     
     public static void main(String[] args) throws Exception{
@@ -16,15 +15,15 @@ public class Main{
         M = Integer.parseInt(values[1]);
         visited = new boolean[N+1];
         
-        
-        backTracking(1);
+        int[] ans = new int[M];
+        backTracking(0, ans);
         System.out.print(mainSj);
     }
     
-    public static void backTracking(int depth){
-        if(depth == M+1){
+    public static void backTracking(int depth, int[] ans){
+        if(depth == M){
             StringJoiner sj = new StringJoiner(" ");
-            for(int val:stack){
+            for(int val:ans){
                 sj.add(Integer.toString(val));
             }
             
@@ -38,12 +37,11 @@ public class Main{
                 continue;
             }
             
-            stack.push(i);
             visited[i]= true;
             
-            backTracking(depth+1);
+            ans[depth] = i;
+            backTracking(depth+1, ans);
             
-            stack.pop();
             visited[i]= false;
         }
     }
