@@ -1,41 +1,50 @@
+import java.io.*;
 import java.util.*;
 
-class Main{
-    static int n, m;
-    static int ans[];
+public class Main{
+    static int N;
+    static int M;
+    static StringJoiner mainSj = new StringJoiner("\n");
+    static Stack<Integer> stack = new Stack<>();
     static boolean[] visited;
-    static StringBuilder sb=new StringBuilder();
     
-    public static void main(String[] args){
-        Scanner scanner=new Scanner(System.in);
-        n=scanner.nextInt(); m=scanner.nextInt();
+    public static void main(String[] args) throws Exception{
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String[] values = br.readLine().split(" ");
         
-        ans=new int[m];
-        visited=new boolean[n+1];
-        backTracking(0);
+        N = Integer.parseInt(values[0]);
+        M = Integer.parseInt(values[1]);
+        visited = new boolean[N+1];
         
-        System.out.print(sb);
+        
+        backTracking(1);
+        System.out.print(mainSj);
     }
     
-    private static void backTracking(int idx){
-        if(idx==m){
-            for(int num:ans){
-                sb.append(num).append(" ");
+    public static void backTracking(int depth){
+        if(depth == M+1){
+            StringJoiner sj = new StringJoiner(" ");
+            for(int val:stack){
+                sj.add(Integer.toString(val));
             }
-            sb.append("\n");
+            
+            mainSj.add(sj.toString());
             
             return;
         }
         
-        for(int i=1;i<=n;i++){
-            if(!visited[i]){
-                visited[i]=true;
-                ans[idx]=i;
-                
-                backTracking(idx+1);
-                
-                visited[i]=false;
+        for(int i=1;i<=N;i++){
+            if(visited[i]){
+                continue;
             }
+            
+            stack.push(i);
+            visited[i]= true;
+            
+            backTracking(depth+1);
+            
+            stack.pop();
+            visited[i]= false;
         }
     }
 }
