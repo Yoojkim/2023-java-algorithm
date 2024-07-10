@@ -1,82 +1,109 @@
 import java.util.*;
 import java.io.*;
 
-public class Main{
-    
-    static int[][] fields;
-    static int n, m;
-    static int ans=0;
-    
-    //북동남서
-    static int[][] displacements={
-        {-1, 0}, {0, 1}, {1, 0}, {0, -1}
-    };
-    
-    private static void dfs(int x, int y, int d){
-        if(fields[x][y]==0){
-            ans++;
-            fields[x][y]=2; //clean
-        }
-        
-        boolean nearNotClean=notCleanRoom(x, y);
-        if(nearNotClean){
-            int newD=(d-1<0?3:d-1);
-            int newX=x+displacements[newD][0];
-            int newY=y+displacements[newD][1];
-            
-            if(newX>=0 && newX<n && newY>=0 && newY<m && fields[newX][newY]==0){
-                dfs(newX, newY, newD);
-            } else{
-                dfs(x, y, newD);
-            }
-            
-        } else{
-            //back
-            int newD=(d+2)%4;
-            int newX=x+displacements[newD][0];
-            int newY=y+displacements[newD][1];
-            
-            if(newX<0 || newX>=n || newY<0 || newY>=m || fields[newX][newY]==1)
-                return;
-            
-            dfs(newX, newY, d);
-        }
+class Coor{
+    int x;
+    int y;
+    int d;
+
+    public Coor(int x, int y, int d){
+        this.x=x;
+        this.y=y;
+        this.d=d;
     }
-    
-    private static boolean notCleanRoom(int x, int y){
-        for(int[] dp:displacements){
-            int newX=x+dp[0];
-            int newY=y+dp[1];
-            
-            if(newX>=0 && newX<n && newY>=0 && newY<m && fields[newX][newY]==0)
-                return true;
-        }
-        
-        return false;
-    } 
-    
+}
+
+class Direction{
+    int dx;
+    int dy;
+
+    public Direction(int dx, int dy){
+        this.dx=dx;
+        this.dy=dy;
+    }
+}
+
+class Main{
+    static int N;
+    static int M;
+    static int[][] rooms; //0: 청소x 1: 벽 2: 청소o
+    static int cleanCnt;
+    static Coor nowCoor;
+
+    //북, 동, 남, 서
+    static Direction[] directions = {
+            new Direction(-1, 0),
+            new Direction(0, 1),
+            new Direction(1, 0),
+            new Direction(0, -1)
+    };
+
     public static void main(String[] args) throws Exception{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        
-        String[] roomSize=br.readLine().split(" ");
-        n=Integer.parseInt(roomSize[0]);
-        m=Integer.parseInt(roomSize[1]);
-        
-        String[] conditions=br.readLine().split(" ");
-        int r=Integer.parseInt(conditions[0]);
-        int c=Integer.parseInt(conditions[1]);
-        int d=Integer.parseInt(conditions[2]);
-        
-        fields=new int[n][m];
-        
-        for(int i=0;i<n;i++){
-            StringTokenizer st=new StringTokenizer(br.readLine());
-            for(int j=0;j<m;j++){
-                fields[i][j]=Integer.parseInt(st.nextToken());
+        StringTokenizer st = new StringTokenizer(br.readLine());
+
+        N = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
+
+        st = new StringTokenizer(br.readLine());
+        nowCoor = new Coor(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()));
+
+        rooms = new int[N][M];
+        for(int i=0;i<N;i++){
+            st = new StringTokenizer(br.readLine());
+            for(int j=0;j<M;j++){
+                rooms[i][j] = Integer.parseInt(st.nextToken());
             }
         }
-        
-        dfs(r, c, d);
-        System.out.print(ans);
+
+        clean();
+        System.out.print(cleanCnt);
+    }
+
+    static void clean(){
+        while(true){
+            if(rooms[nowCoor.x][nowCoor.y] == 0){
+                rooms[nowCoor.x][nowCoor.y] = 2;
+                cleanCnt ++;
+            }
+
+            if(isNearAllCleaned()){
+                int nowD = nowCoor.d;
+                int newX = nowCoor.x + directions[nowD].dx*-1;
+                int newY = nowCoor.y + directions[nowD].dy*-1;
+
+                if(rooms[newX][newY] == 1){
+                    return; //break;
+                }
+
+                nowCoor = new Coor(newX, newY, nowCoor.d);
+                continue;
+            }
+
+            //else
+            int newD = nowCoor.d - 1;
+            newD = (newD<0)?newD+4:newD;
+
+            int newX = nowCoor.x + directions[newD].dx;
+            int newY = nowCoor.y + directions[newD].dy;
+            if(rooms[newX][newY] == 0){
+                nowCoor = new Coor(newX, newY, newD);
+            } else{
+                nowCoor = new Coor(nowCoor.x, nowCoor.y, newD);
+            }
+        }
+    }
+
+    static boolean isNearAllCleaned(){
+        for(Direction d:directions){
+            int newX = nowCoor.x+d.dx;
+            int newY = nowCoor.y+d.dy;
+
+            if(rooms[newX][newY] == 0){
+                return false;
+            }
+        }
+
+        return true;
     }
 }
