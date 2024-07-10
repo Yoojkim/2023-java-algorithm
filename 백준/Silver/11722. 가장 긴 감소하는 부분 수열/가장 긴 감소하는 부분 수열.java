@@ -1,6 +1,7 @@
 import java.io.*;
 import java.util.*;
 
+//시간복잡도가 크지 않아서 막 해도 괜찮음 
 public class Main{
     public static void main(String[] args) throws Exception{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
