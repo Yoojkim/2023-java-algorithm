@@ -2,64 +2,64 @@ import java.util.*;
 import java.io.*;
 
 public class Main{
-
-    private static int rain(int[] ws){
-        
-        int result=0;
-        
-        for(int i=1;i<ws.length-1;i++){
-            int leftMax=getMaxLeft(ws, i);
-            int rightMax=getMaxRight(ws, i);
-            
-            int maxRain=leftMax;
-            if(maxRain>rightMax)
-                maxRain=rightMax;
-            
-            int rain=maxRain-ws[i];
-            if(rain>0)
-                result+=rain;
-        }
-        
-        return result;
-    }
-    
-    private static int getMaxLeft(int[] ws, int idx){
-        //idx 포함하여 제일 큰 left idx 
-        int val=ws[idx];
-        for(int i=idx; i>=0; i--){
-            if (val<ws[i])
-                val=ws[i];
-        }
-        
-        return val;
-    }
-    
-    private static int getMaxRight(int[] ws, int idx){
-        //idx 포함하여 제일 큰 right idx
-        int val=ws[idx];
-        for(int i=idx;i<ws.length;i++){
-            if(val<ws[i])
-                val=ws[i];
-        }
-        
-        return val;
-    }
-
-
-
     public static void main(String[] args) throws Exception{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st=new StringTokenizer(br.readLine());
+        StringTokenizer st = new StringTokenizer(br.readLine());
 
-        int h=Integer.parseInt(st.nextToken());
-        int w=Integer.parseInt(st.nextToken());
+        int H = Integer.parseInt(st.nextToken());
+        int W = Integer.parseInt(st.nextToken());
 
-        int[] ws=new int[w];
-        st=new StringTokenizer(br.readLine());
-        for(int i=0;i<w;i++){
-            ws[i]=Integer.parseInt(st.nextToken());
+        st = new StringTokenizer(br.readLine());
+        int[] rains = new int[W];
+
+        for(int i=0;i<W;i++){
+            rains[i] = Integer.parseInt(st.nextToken());
         }
 
-        System.out.println(rain(ws));
+        //구현
+        int index = 0;
+        int result = 0;
+        while(index < W){
+            boolean find = false;
+
+            //1. 만족하는 거 찾음
+            for(int i=index+1; i<W; i++){
+                if(rains[index] <= rains[i]){
+                    for(int j=index+1; j<i; j++){
+                        result += rains[index] - rains[j];
+                    }
+
+                    index = i;
+                    find = true;
+                    break;
+                }
+            }
+
+            //2. 만족하는 거 못찾음
+            if(!find){
+                //현재 index~최대한 큰 거 끝까지 찾아서
+                int max = Integer.MIN_VALUE;
+                int maxIdx = -1;
+
+                for(int i = index +1;i<W;i++){
+                    if(max < rains[i]){
+                        max = rains[i];
+                        maxIdx = i;
+                    }
+                }
+
+                if(maxIdx == -1){
+                    break;
+                }
+
+                for(int i = index +1; i<maxIdx ; i++){
+                    result +=  max - rains[i];
+                }
+
+                index = maxIdx;
+            }
+        }
+
+        System.out.print(result);
     }
 }
