@@ -1,80 +1,86 @@
 import java.util.*;
 import java.io.*;
 
+class Point{
+    int x;
+    int y;
+    
+    public Point(int x, int y){
+        this.x=x;
+        this.y=y;
+    }
+}
 public class Main{
-
-    static int[][] dps={
-            {-1, 0}, {1, 0}, {0, -1}, {0, 1}
+    static int[][] dps = {
+        {0, -1}, {0, 1}, {-1, 0}, {1, 0}
     };
-
+    
     public static void main(String[] args) throws Exception{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
         StringTokenizer st = new StringTokenizer(br.readLine());
-        int m=Integer.parseInt(st.nextToken()); int n=Integer.parseInt(st.nextToken());
-        int[][] tomatos=new int[n][m];
-
-        int nonRipe=0;
-        LinkedList<int[]> queue=new LinkedList();
-        for(int i=0;i<n;i++){
+        
+        int M = Integer.parseInt(st.nextToken());
+        int N = Integer.parseInt(st.nextToken());
+        
+        int[][] tomatos = new int[N][M];//0: 안익토, 1:익토, -1:빈칸
+        Queue<Point> queue = new LinkedList<>();
+        
+        
+        for(int i=0;i<N;i++){
             st = new StringTokenizer(br.readLine());
-            for(int j=0;j<m;j++){
-                int tomato=Integer.parseInt(st.nextToken());
-                tomatos[i][j]=tomato;
-
-                if(tomato==0)
-                    nonRipe++;
-
-                if(tomato==1){
-                    int[] point={i, j};
-                    queue.addLast(point);
+            for(int j=0;j<M;j++){
+                int tomato= Integer.parseInt(st.nextToken());
+                tomatos[i][j] = tomato;
+                
+                if(tomato == 1){
+                    queue.add(new Point(i, j));
                 }
             }
         }
-
-        int ans=0;
-        if(nonRipe!=0){
-            ans=getMinDays(n, m, tomatos, queue, nonRipe);
-        }
-
-        System.out.print(ans);
-    }
-
-    private static int getMinDays(int n, int m, int[][] tomatos, LinkedList<int[]> queue, int nonRipe){
-        int days=0; int ripeCnt=0;
-
+        
+        //bfs
+        int days = 0;
         while(!queue.isEmpty()){
-
-            //모든 queue tomato 빼기
-            List<int[]> tempTomatos=new ArrayList(queue);
-            queue.clear();
-
-            boolean ripe=false;
-            for(int[] tomato:tempTomatos){
-                //상, 하, 좌, 우 + 안 익음
+            //queue 인접 공간 다시 queue에 넣기
+            Queue<Point> nextQueue = new LinkedList<>();
+            
+            for(Point p:queue){
                 for(int[] dp:dps){
-                    int newI=dp[0]+tomato[0];
-                    int newJ=dp[1]+tomato[1];
-
-                    if(newI<0 || newI>=n || newJ<0 || newJ>=m || tomatos[newI][newJ]!=0)
+                    int nextX = p.x+dp[0];
+                    int nextY = p.y+dp[1];
+                    
+                    if(nextX < 0 || nextX >= N || nextY <0 || nextY >=M){
                         continue;
-
-                    int[] newPoint={newI, newJ};
-                    queue.addLast(newPoint);
-
-                    tomatos[newI][newJ]=1;
-                    ripeCnt++;
-                    ripe=true;
+                    }
+                    
+                    if(tomatos[nextX][nextY] != 0){ 
+                        continue;
+                    }
+                    
+                    tomatos[nextX][nextY] = 1;
+                    nextQueue.add(new Point(nextX, nextY));
                 }
             }
-
-            if(ripe)
+            
+            if(!nextQueue.isEmpty()){
                 days++;
+            }
+            
+            queue = nextQueue;
         }
-
-        if(nonRipe!=ripeCnt)
-            days=-1;
-
-        return days;
+        
+        //토마토가 모두 익지 못하는 순간 -> -1
+        for(int i = 0;i<N;i++){
+            for(int j=0;j<M;j++){
+                if(tomatos[i][j] == 0){
+                    System.out.print(-1);
+                    
+                    return;
+                }
+            }
+        }
+        
+        
+        System.out.print(days);
     }
 }
