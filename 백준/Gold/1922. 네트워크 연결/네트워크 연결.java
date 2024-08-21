@@ -1,66 +1,67 @@
 import java.util.*;
 import java.io.*;
 
-class Edge implements Comparable<Edge>{
-    int node;
+class Line implements Comparable<Line>{
+    int end;
     int cost;
     
-    public Edge(int node, int cost){
-        this.node=node;
+    public Line(int end, int cost){
+        this.end=end;
         this.cost=cost;
     }
     
-    public int compareTo(Edge e){
-        return this.cost-e.cost;
+    public int compareTo(Line line){
+        return Integer.compare(this.cost, line.cost);
     }
 }
 
-class Main{
+public class Main{
     public static void main(String[] args) throws Exception{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        int n=Integer.parseInt(br.readLine());
-        int m=Integer.parseInt(br.readLine());
+        int N = Integer.parseInt(br.readLine());
+        int M = Integer.parseInt(br.readLine());
         
-        LinkedList<Edge>[] nears=new LinkedList[n+1];
-        for(int i=0;i<=n;i++){
-            nears[i]=new LinkedList();
+        int[][] roads = new int[N+1][N+1];
+        
+        StringTokenizer st;
+        while(M-->0){
+            st = new StringTokenizer(br.readLine());
+            
+            int a = Integer.parseInt(st.nextToken());
+            int b = Integer.parseInt(st.nextToken());
+            int c = Integer.parseInt(st.nextToken());
+            
+            roads[a][b]=c;
+            roads[b][a]=c;
         }
         
-        for(int i=0;i<m;i++){
-            String[] nums=br.readLine().split(" ");
-            int node1=Integer.parseInt(nums[0]);
-            int node2=Integer.parseInt(nums[1]);
-            int cost=Integer.parseInt(nums[2]);
-            
-            nears[node1].add(new Edge(node2, cost));
-            nears[node2].add(new Edge(node1, cost));
-        }
+        boolean[] visited = new boolean[N+1];
+        PriorityQueue<Line> queue = new PriorityQueue<>();
+        queue.add(new Line(1, 0));
+        int result = 0;
         
-        int sum=0; int cnt=0;
-        boolean[] visited=new boolean[n+1];
-        PriorityQueue<Edge> queue=new PriorityQueue();
-        queue.add(new Edge(1, 0));
-        while(true){
-            Edge now=queue.poll();
+        while(!queue.isEmpty()){
+            Line line = queue.poll();
             
-            if(visited[now.node])
+            if(visited[line.end]){
                 continue;
+            }
+            visited[line.end]=true;
+            result+=line.cost;
             
-            //현재 now에 해당하는 node 방문
-            cnt++;
-            sum+=now.cost;
-            visited[now.node]=true;
-            
-            if(cnt==n)
-                break;
-            
-            for(Edge near:nears[now.node]){
-                if(visited[near.node])
+            for(int i=1;i<=N;i++){                
+                if(visited[i]){
                     continue;
-                queue.add(near);
+                }
+                
+                if(roads[line.end][i] == 0){
+                    continue;
+                }
+                
+                queue.add(new Line(i, roads[line.end][i]));
             }
         }
         
-        System.out.print(sum);
+        System.out.print(result);
     }
 }
