@@ -15,7 +15,7 @@ public class Main {
         // 초기화: 큰 값으로 채워서 비교 가능하게 함
         dist = new int[N + 1][N + 1];
         for (int i = 1; i <= N; i++) {
-            Arrays.fill(dist[i], 100000); // 충분히 큰 값으로 초기화
+            Arrays.fill(dist[i], Integer.MAX_VALUE); // 충분히 큰 값으로 초기화
             dist[i][i] = 0; // 자기 자신으로의 경로는 0
         }
 
@@ -38,6 +38,10 @@ public class Main {
         for (int k = 1; k <= N; k++) {
             for (int i = 1; i <= N; i++) {
                 for (int j = 1; j <= N; j++) {
+                    if(dist[i][k] == Integer.MAX_VALUE || dist[k][j] == Integer.MAX_VALUE){
+                        continue;
+                    }
+                    
                     if (dist[i][j] > dist[i][k] + dist[k][j]) {
                         dist[i][j] = dist[i][k] + dist[k][j];
                     }
