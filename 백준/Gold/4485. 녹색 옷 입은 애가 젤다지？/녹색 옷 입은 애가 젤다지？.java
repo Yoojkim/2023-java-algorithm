@@ -1,84 +1,87 @@
 import java.util.*;
 import java.io.*;
 
-class Point{
+class Point implements Comparable<Point>{
     int x;
     int y;
-
-    public Point(int x, int y){
+    int dist;
+    
+    public Point(int x, int y, int dist){
         this.x=x;
         this.y=y;
+        this.dist=dist;
+    }
+    
+    public int compareTo(Point p){
+        return Integer.compare(this.dist, p.dist);
     }
 }
 
 class Main{
-    static int[][] dps={
-            {-1, 0}, {1, 0}, {0, -1}, {0, 1}
+    
+    //상하좌우
+    static int[][] dps = {
+        {-1, 0}, {1, 0}, {0, -1}, {0, 1}
     };
-
-    public static void main(String[] args)throws Exception{
+    
+    public static void main(String[] args) throws Exception{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringBuilder sb=new StringBuilder();
-
+        
         int cnt=1;
         while(true){
-            int n=Integer.parseInt(br.readLine());
-
-            if(n==0)
+            int N = Integer.parseInt(br.readLine());
+            
+            if(N==0){
                 break;
-
-            int arr[][]=new int[n][n];
-            for(int i=0;i<n;i++){
-                StringTokenizer st=new StringTokenizer(br.readLine());
-                for(int j=0;j<n;j++){
-                    arr[i][j]=Integer.parseInt(st.nextToken());
-                }
             }
-
-            int ans=bfs(n, arr);
-            sb.append("Problem ").append(cnt).append(": ").append(ans).append("\n");
+            
+            int[][] fields = new int[N][N];
+        StringTokenizer st;
+        for(int i=0;i<N;i++){
+            st = new StringTokenizer(br.readLine());
+            
+            for(int j=0;j<N;j++){
+                fields[i][j] = Integer.parseInt(st.nextToken());
+            }
+        }
+            
+            find(N, cnt, fields);
             cnt++;
         }
-
-        System.out.print(sb);
     }
-
-    //visited 처리
-    private static int bfs(int n, int[][] arr){
-
-        LinkedList<Point> queue=new LinkedList<>();
-        int[][] ans=new int[n][n];
-
-        for(int i=0;i<n;i++){
-            for(int j=0;j<n;j++){
-                ans[i][j]=Integer.MAX_VALUE;
-            }
-        }
-
-        queue.addLast(new Point(0, 0));
-        ans[0][0]=arr[0][0];
-
+    
+    static void find(int N, int cnt, int[][] fields){
+            boolean[][] visited = new boolean[N][N];
+        
+        Point start = new Point(0, 0, fields[0][0]);
+        PriorityQueue<Point> queue = new PriorityQueue();
+        queue.add(start);
+        
         while(!queue.isEmpty()){
-            Point now=queue.poll();
-
-            for(int[] dp:dps){
-                int newX=now.x+dp[0];
-                int newY=now.y+dp[1];
-
-                if(newX<0 || newX>=n || newY<0 || newY>=n)
-                    continue;
-
-                int newVal=ans[now.x][now.y]+arr[newX][newY];
-
-                if(ans[newX][newY]<=newVal)
-                    continue;
-
-                ans[newX][newY]=newVal;
-
-                queue.addLast(new Point(newX, newY));
+            Point point = queue.poll();
+            
+            if(point.x == N-1 && point.y == N-1){
+                System.out.println(String.format("Problem %d: %d", cnt, point.dist));
+                
+                return;
             }
+            
+            for(int[] dp:dps){
+                int newX = point.x + dp[0];
+                int newY = point.y + dp[1];
+                
+                if(newX < 0 || newX == N || newY <0 || newY == N){
+                    continue;
+                }
+                
+                if(visited[newX][newY]){
+                    continue;
+                }
+                
+                visited[newX][newY] = true;
+                queue.add(new Point(newX, newY, point.dist+fields[newX][newY]));
+            }
+            
         }
-
-        return ans[n-1][n-1];
     }
 }
