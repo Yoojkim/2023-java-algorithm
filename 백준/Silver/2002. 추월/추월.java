@@ -12,7 +12,7 @@ class Main{
 
         //out
         Queue<String> out = new LinkedList<>();
-        List<String> alreadyOut = new ArrayList<>();
+        Set<String> alreadyOut = new HashSet<>();
 
         for(int i=0;i<N;i++){
             in.add(br.readLine());
@@ -38,7 +38,7 @@ class Main{
         System.out.print(cnt);
     }
 
-    static String getInCar(Queue<String> in, List<String> alreadyOut){
+    static String getInCar(Queue<String> in, Set<String> alreadyOut){
         while(!in.isEmpty()){
             String inCar = in.peek();
 
