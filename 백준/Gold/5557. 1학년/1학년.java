@@ -1,39 +1,41 @@
 import java.util.*;
 import java.io.*;
 
-public class Main{
-    static final int MAX = 20;
-    public static void main(String[] args)throws Exception{
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+class Main{
+    static int MAX = 20;
+    public static void main(String[] args) throws Exception{
+        BufferedReader br= new BufferedReader(new InputStreamReader(System.in));
 
         int N = Integer.parseInt(br.readLine());
+        long[][] dp = new long[N][MAX+1];
+
         StringTokenizer st = new StringTokenizer(br.readLine());
 
-        int[] nums = new int[N];
-        for(int i=0;i<N;i++){
-            nums[i] = Integer.parseInt(st.nextToken());
-        }
-
-        long[][] dp = new long[N-1][MAX+1];
-        dp[0][nums[0]] = 1;
-
+        int start = Integer.parseInt(st.nextToken());
+        dp[0][start]++;
         for(int i=1;i<N-1;i++){
-            for(int n=0;n<=20;n++){
-                if(dp[i-1][n]>0){
-                    int plusSum = n + nums[i];
+            int now = Integer.parseInt(st.nextToken());
 
-                    if(plusSum >=0 && plusSum<=20){
-                        dp[i][plusSum] += dp[i-1][n];
-                    }
+            for(int prev = 0;prev<=MAX;prev++){
+                if(dp[i-1][prev] == 0){
+                    continue;
+                }
 
-                    int minusSum = n-nums[i];
-                    if(minusSum>=0 && minusSum<=20){
-                        dp[i][minusSum] += dp[i-1][n];
-                    }
+                int plus = prev + now;
+                int minus = prev - now;
+
+                if(plus >= 0 && plus<=MAX){
+                    dp[i][plus] += dp[i-1][prev];
+                }
+
+                if(minus >= 0 && minus<=MAX){
+                    dp[i][minus] += dp[i-1][prev];
                 }
             }
         }
-        
-        System.out.println(dp[N-2][nums[N-1]]);
+
+        int result = Integer.parseInt(st.nextToken());
+
+        System.out.print(dp[N-2][result]);
     }
 }
