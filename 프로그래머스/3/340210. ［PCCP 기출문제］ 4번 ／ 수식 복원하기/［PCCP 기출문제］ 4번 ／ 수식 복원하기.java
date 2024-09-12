@@ -17,17 +17,6 @@ class Solution {
                     min =c-'0'; 
                 }
             }
-            
-            if(eSplit[4].equals("X")){
-                continue;
-            }
-            
-            for(char c:eSplit[4].toCharArray()){
-                if(c-'0'>min){
-                    min =c-'0'; 
-                }
-            }
-            
         }
         min++;
         
