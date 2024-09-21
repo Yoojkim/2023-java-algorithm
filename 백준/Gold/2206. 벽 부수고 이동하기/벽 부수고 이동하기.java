@@ -50,7 +50,7 @@ class Main{
 
     static int bfs(){
     int result = 1;
-    boolean[][][] visited = new boolean[N+1][M+1][2]; // 2 layers: [][0] for unbroken, [][1] for broken wall
+    boolean[][][] visited = new boolean[N+1][M+1][2]; //0: 벽 파괴x 1: 벽 파괴
     Point start = new Point(1, 1, false);
     visited[1][1][0] = true;
 
@@ -74,22 +74,27 @@ class Main{
                 if(newX <= 0 || newX > N || newY <= 0 || newY > M){
                     continue;
                 }
-
-                if(visited[newX][newY][broke ? 1 : 0]){
+                
+                //이미 방문한 경우 제외
+                if(visited[newX][newY][broke?1:0]){
                     continue;
                 }
-
+                
+                //벽 파괴하는 경우
                 if(!fields[newX][newY]){
                     if(broke){
                         continue;
                     }
 
                     nextQueue.add(new Point(newX, newY, true));
-                    visited[newX][newY][1] = true; // Mark visited with wall broken
-                } else {
-                    nextQueue.add(new Point(newX, newY, broke));
-                    visited[newX][newY][broke ? 1 : 0] = true; // Mark visited with or without wall broken
-                }
+                    visited[newX][newY][1] = true;
+                    
+                    continue;
+                } 
+                
+                //파괴 안 하는 경우
+                nextQueue.add(new Point(newX, newY, broke));
+                visited[newX][newY][broke?1:0] = true; 
             }
         }
 
