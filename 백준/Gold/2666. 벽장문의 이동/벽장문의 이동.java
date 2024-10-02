@@ -36,6 +36,10 @@ class Main{
             return;
         }
         
+        if(cnt > min){
+            return;
+        }
+        
         //a로 옮기기
         int next = seq.poll();
         backTracking(cnt+calcualteCnt(a, next), next, b);
