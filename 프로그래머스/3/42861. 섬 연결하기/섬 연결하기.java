@@ -1,44 +1,61 @@
 import java.util.*;
 
-class Edge implements Comparable<Edge>{
-    int island1;
-    int island2;
-    int cost;
+//MST
+class Road implements Comparable<Road>{
+    int a;
+    int b;
+    int c;
     
-    public Edge(int island1, int island2, int cost){
-        this.island1 = island1;
-        this.island2 = island2;
-        this.cost= cost;
+    public Road(int a, int b, int c){
+        this.a=a;
+        this.b=b;
+        this.c=c;
     }
     
-    public int compareTo(Edge e){
-        return Integer.compare(this.cost, e.cost);
+    public int compareTo(Road r){
+        return this.c-r.c;
     }
 }
 
 class Solution {
-    
+    int[] parents;
     public int solution(int n, int[][] costs) {
-        PriorityQueue<Edge> queue = new PriorityQueue<>();
-        
+        PriorityQueue<Road> queue = new PriorityQueue<>();
         for(int[] cost:costs){
-            queue.add(new Edge(cost[0], cost[1], cost[2]));
+            queue.add(new Road(cost[0], cost[1], cost[2]));
         }
         
-        boolean[] visited = new boolean[n];
-        int result=0;
+        int sum=0;
+        parents = new int[n];
+        for(int i=0;i<n;i++){
+            parents[i] = i;
+        }
+        
         while(!queue.isEmpty()){
-            Edge newEdge = queue.poll();
-            
-            if(visited[newEdge.island1] && visited[newEdge.island2]){
+            Road road = queue.poll();
+            int parentA = find(road.a);
+            int parentB = find(road.b);
+
+            if(parentA == parentB){
                 continue;
-            }
+            } 
             
-            visited[newEdge.island1] = true;
-            visited[newEdge.island2] = true;
-            result+= newEdge.cost;
+            sum+=road.c;
+            
+            //하나의 섬으로 연결
+            parents[parentA] = parentB;
+           
         }
         
-        return result;
+        return sum;
     }
+    
+    private int find(int node){
+        while(node != parents[node]){
+            node = parents[node];
+        }
+        
+        return node;
+    }
+    
 }
