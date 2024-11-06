@@ -1,72 +1,89 @@
 import java.util.*;
 import java.io.*;
 
-public class Main{
-    public static void main(String[] args) throws Exception{
+public class Main {
+    static boolean[] assigned = new boolean['z' - 'a'+1];
+
+    public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
         int N = Integer.parseInt(br.readLine());
-
-        boolean[] assign = new boolean['Z'+1];
         StringJoiner sj = new StringJoiner("\n");
-        for(int i=0;i<N;i++){
-            String option = br.readLine();
-            String[] words = option.split(" ");
+        StringBuilder sb = new StringBuilder();
+        while (N-- > 0) {
+            String fullOption = br.readLine();
+            String[] options = fullOption.split(" ");
 
-            //단어 앞 확인 로직
-            boolean assignCheck = false;
-            for(int w=0;w<words.length;w++){
-                char firstAlphaUpper = words[w].toUpperCase().toCharArray()[0];
+            sb.setLength(0);
+            boolean complete = false;
 
-                if(assign[firstAlphaUpper]){
+            //단어 첫글자 옵션 확인
+            for (String option : options) {
+                if (complete) {
+                    sb.append(option).append(" ");
                     continue;
                 }
 
-                StringBuilder sb = new StringBuilder();
-                sb.append('[').append(words[w].toCharArray()[0]).append(']').append(words[w].substring(1));
-                words[w] = sb.toString();
+                char firstAlpha = option.charAt(0);
 
-                assign[firstAlphaUpper] = true;
-                assignCheck = true;
-
-                break;
-            }
-
-            //왼 -> 오
-            if(!assignCheck){
-                for(int w=0;w<words.length;w++){
-                    String word = words[w];
-                    char[] wordArr = word.toCharArray();
-
-                    boolean wordAssign = false;
-                    for(int c=0;c<wordArr.length;c++){
-                        char upperAlpha = Character.toUpperCase(wordArr[c]);
-
-                        if(assign[upperAlpha]){
-                            continue;
-                        }
-
-                        assign[upperAlpha] = true;
-                        String newWord = word.substring(0, c)+'['+wordArr[c]+']'+word.substring(c+1);
-                        words[w] = newWord;
-                        wordAssign = true;
-
-                        break;
-                    }
-
-                    if(wordAssign){
-                        break;
-                    }
+                if (isAssigned(firstAlpha)) {
+                    sb.append(option).append(" ");
+                    continue;
                 }
+
+                assign(firstAlpha);
+                complete = true;
+                String remained = option.substring(1);
+
+                sb.append("[").append(firstAlpha).append("]").append(remained).append(" ");
             }
 
-            StringJoiner subSj = new StringJoiner(" ");
-            for(String word:words){
-                subSj.add(word);
+            if (complete) {
+                sj.add(sb.toString().trim());
+                continue;
+
+            } else {
+                sb.setLength(0);
             }
 
-            sj.add(subSj.toString());
+            //전체 풀 스캔
+            for (char alpha : fullOption.toCharArray()) {
+                if (complete) {
+                    sb.append(alpha);
+
+                    continue;
+                }
+
+                if (alpha == ' ' || isAssigned(alpha)){
+                    sb.append(alpha);
+
+                    continue;
+                }
+
+                complete = true;
+                assign(alpha);
+                sb.append("[").append(alpha).append("]");
+            }
+
+            sj.add(sb.toString().trim());
         }
 
         System.out.print(sj);
+    }
+
+    private static void assign(char alphabet) {
+        if (alphabet < 'a') {
+            alphabet += 'a' - 'A';
+        }
+
+        assigned[alphabet - 'a'] = true;
+    }
+
+    private static boolean isAssigned(char alphabet) {
+        if (alphabet < 'a') {
+            alphabet += 'a' - 'A';
+        }
+
+        return assigned[alphabet - 'a'];
     }
 }
