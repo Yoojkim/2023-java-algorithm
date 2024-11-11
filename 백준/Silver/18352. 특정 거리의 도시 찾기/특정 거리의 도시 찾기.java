@@ -26,7 +26,7 @@ class Main{
 
         int[] dist = new int[N+1];
         PriorityQueue<int[]> queue = new PriorityQueue<>((int[]a, int[]b)-> Integer.compare(a[1], b[1]));
-        dist[X] = 0;
+        dist[X]=-1;
         for(int destination:roads[X]){
             queue.add(new int[]{destination, 1});
         }
@@ -41,6 +41,11 @@ class Main{
                 continue;
             }
 
+            //추가한 것
+            if(cost > K){
+                break;
+            }
+
             dist[dest] = cost;
             for(int destDest : roads[dest]){
                 queue.add(new int[]{destDest, cost+1});
@@ -49,10 +54,6 @@ class Main{
 
         StringJoiner sj = new StringJoiner("\n");
         for(int i=1;i<N+1;i++){
-            if(i==X){
-                continue;
-            }
-
             if(dist[i] != K){
                 continue;
             }
