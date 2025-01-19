@@ -1,115 +1,122 @@
 import java.util.*;
 import java.io.*;
 
-public class Main{
+class Main{
+    static int n = 10;
+    //1, 2, 3, 4, 5
+    static int[][] fields = new int[n][n];
+    static int min = Integer.MAX_VALUE;
+    static int[] counts = {
+            0, 5, 5, 5, 5, 5
+    };
+    static int result;
+
     public static void main(String[] args) throws Exception{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int[][] arr=new int[10][10];
         StringTokenizer st;
-        for(int i=0;i<10;i++){
-            st=new StringTokenizer(br.readLine());
-            for(int j=0;j<10;j++){
-                arr[i][j]=Integer.parseInt(st.nextToken());
-            }
-        }
+        for(int i=0;i<n;i++) {
+            st = new StringTokenizer(br.readLine());
 
-        int[] sizes=new int[6]; //1~5
+            for(int j=0;j<n;j++) {
+                int value = Integer.parseInt(st.nextToken());
+                fields[i][j] = value;
 
-        int ans=backTracking(arr, sizes, 0, 0);
-        ans=(ans==Integer.MAX_VALUE)?-1:ans;
-
-        System.out.print(ans);
-    }
-
-    private static int backTracking(int[][] arr, int[] sizes, int i, int j){
-        if(i==10){
-            int cnt=0;
-            for(int size:sizes){
-                cnt+=size;
-            }
-
-            return cnt;
-        }
-
-        int[] nextPoint=getNextPoint(i, j);
-
-        int min=Integer.MAX_VALUE;
-        if(arr[i][j]==0){
-            int res=backTracking(arr, sizes, nextPoint[0], nextPoint[1]);
-
-            if(min>res)
-                min=res;
-        } else{
-            for(int size=5; size>0; size--){
-                if(possible(arr, sizes, i, j, size)){
-                    //attach
-                    attach(arr, i, j, size);
-                    sizes[size]++;
-
-                    int res=backTracking(arr, sizes, nextPoint[0], nextPoint[1]);
-                    if(min>res)
-                        min=res;
-
-                    //detach
-                    detach(arr, i, j, size);
-                    sizes[size]--;
+                if(value == 1) {
+                    result++;
                 }
             }
         }
 
-        return min;
-    }
+        if(result == 0){
+            System.out.print(0);
 
-    private static boolean possible(int[][] arr, int[] sizes, int i, int j, int size){
-        //현재 i, j에서 size가 가능한지
-
-        //outOfRange 처리
-        if(i+size-1 >=10 || j+size-1 >=10)
-            return false;
-
-
-        for(int row=0; row<size;row++){
-            for(int col=0;col<size;col++){
-                if(arr[i+row][j+col]==0)
-                    return false;
-            }
+            return;
         }
 
-        if(sizes[size]==5)
+        backTracking2(0, 0, 0);
+
+        if(min == Integer.MAX_VALUE) {
+            System.out.print(-1);
+        } else {
+            System.out.print(min);
+        }
+    }
+
+    static void backTracking2(int i, int j, int used){
+        if(result == 0){
+            min = Math.min(min, used);
+
+            return;
+        }
+
+        if(j>=n){
+            backTracking2(i+1, 0, used);
+
+            return;
+        }
+
+        if(i>=n || j>=n){
+            return;
+        }
+
+        if(fields[i][j] == 0){
+            backTracking2(i, j+1, used);
+
+            return;
+        }
+
+        for(int p=1;p<=5;p++){
+            if(isPossible(i, j, p)){
+                counts[p]--;
+                attach(i, j, p);
+                result-=p*p;
+
+                backTracking2(i, j+p, used+1);
+
+                counts[p]++;
+                detach(i, j, p);
+                result+=p*p;
+            }
+        }
+    }
+
+    static void attach(int i, int j, int paper) {
+        for(int row=i; row<=i+paper-1;row++) {
+            for(int col=j;col<=j+paper-1;col++) {
+                fields[row][col] = 0;
+            }
+        }
+    }
+
+    static void detach(int i, int j, int paper) {
+        for(int row=i; row<=i+paper-1;row++) {
+            for(int col=j;col<=j+paper-1;col++) {
+                fields[row][col] = 1;
+            }
+        }
+    }
+
+    static boolean isPossible(int i, int j, int paper) {
+        int endI = i+paper-1;
+        int endJ = j+paper-1;
+
+        if(endI >= n || endJ>=n) {
             return false;
+        }
+
+        if(counts[paper]<1) {
+            return false;
+        }
+
+        for(int row=i; row<=endI; row++) {
+            for(int col=j; col<=endJ; col++) {
+                if(fields[row][col] == 0) {
+                    return false;
+                }
+            }
+        }
 
         return true;
     }
-
-    private static void attach(int[][] arr, int i, int j, int size){
-        for(int row=0; row<size;row++){
-            for(int col=0;col<size;col++){
-                arr[i+row][j+col]=0;
-            }
-        }
-    }
-
-    private static void detach(int[][] arr, int i, int j, int size){
-        for(int row=0; row<size;row++){
-            for(int col=0;col<size;col++){
-                arr[i+row][j+col]=1;
-            }
-        }
-    }
-
-    private static int[] getNextPoint(int i, int j){
-        int[] ans=new int[2];
-
-        if(j+1==10){
-            ans[0]=i+1;
-            ans[1]=0;
-        }else{
-            ans[0]=i;
-            ans[1]=j+1;
-        }
-
-        return ans;
-    }
-
 }
