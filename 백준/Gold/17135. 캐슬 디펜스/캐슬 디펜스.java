@@ -1,7 +1,5 @@
-import java.util.*;
 import java.io.*;
-
-//아니 막 어렵진 않은데 코드가 더러움;
+import java.util.*;
 
 class Point{
     int i;
@@ -11,151 +9,125 @@ class Point{
         this.i=i;
         this.j=j;
     }
-}
 
-class Enemy implements Comparable<Enemy>{
-    int idx;
-    int j;
-    int dist;
-
-    public Enemy(int idx, int j, int dist){
-        this.idx=idx;
-        this.j=j;
-        this.dist=dist;
-    }
-
-    public int compareTo(Enemy e){
-        int res=this.dist-e.dist;
-        if(res<0){
-            return -1;
-        } else if(res==0)
-            return this.j-e.j;
-        else{
-            return 1;
-        }
+    static int calDist(Point p1, Point p2){
+        return Math.abs(p2.i-p1.i)+Math.abs(p2.j-p1.j);
     }
 }
 
-public class Main{
+public class Main {
     public static void main(String[] args) throws Exception{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st=new StringTokenizer(br.readLine());
 
-        int n=Integer.parseInt(st.nextToken());
-        int m=Integer.parseInt(st.nextToken());
-        int d=Integer.parseInt(st.nextToken());
+        StringTokenizer st = new StringTokenizer(br.readLine());
 
-        LinkedList<Point> points=new LinkedList<>();
-        for(int i=0;i<n;i++){
-            st=new StringTokenizer(br.readLine());
-            for(int j=0;j<m;j++){
-                int val=Integer.parseInt(st.nextToken());
+        int N = Integer.parseInt(st.nextToken());
+        int M = Integer.parseInt(st.nextToken());
+        int D = Integer.parseInt(st.nextToken());
 
-                if(val==1)
-                    points.add(new Point(i, j));
+        int[][] fields = new int[N][M];
+
+        for(int i=0;i<N;i++){
+            st= new StringTokenizer(br.readLine());
+            for(int j=0;j<M;j++){
+                fields[i][j] = Integer.parseInt(st.nextToken());
             }
         }
 
-        List<Integer> archers=new LinkedList<>();
-        int ans=backTracking(0, n, m, points, archers, d);
-        System.out.print(ans);
+        System.out.print(backTracking(0, new LinkedList<>(), N, M, D, fields));
     }
 
-    private static int backTracking(int idx, int n, int m, List<Point> points, List<Integer> archers, int d){
-        if(archers.size()==3){
-            List<Point> newPoints=new LinkedList<>();
+    static int backTracking(int col, List<Integer> group, int N, int M, int D, int[][] fields){
+        int max = 0;
 
-            for(Point p:points){
-                newPoints.add(new Point(p.i, p.j));
-            }
-            return getAns(n, newPoints, archers, d);
+        if(group.size() == 3){
+            return calculate(group, N, M, D, fields);
         }
 
-        int max=Integer.MIN_VALUE;
-        for(int i=idx;i<m;i++){
-            archers.add(i);
-            int ans=backTracking(i+1, n, m, points, archers, d);
-
-            if(max<ans)
-                max=ans;
-
-            archers.remove(archers.size()-1);
+        if(col == M){
+            return 0;
         }
+
+        //포함
+        group.add(col);
+        max = Math.max(max, backTracking(col+1, group, N, M, D, fields));
+        group.remove(group.size()-1);
+
+        //미포함
+        max = Math.max(max, backTracking(col+1, group, N, M, D, fields));
 
         return max;
     }
 
-    private static int getAns(int n, List<Point> points, List<Integer> archers, int d){
-        int cnt=0;
+    static int calculate(List<Integer> group, int N, int M, int D, int[][] fields){
+        Set<Integer> enemies = new HashSet<>();
 
-        while(true){
-            if(points.size()==0)
-                break;
+        boolean[][] visited = new boolean[N][M];
+        for(int i=N;i>0;i--){
+            Set<Point> attackedEnemyThisTurn = new HashSet<>();
+            for(int soldier:group){
+                Point p = new Point(i, soldier);
 
-            Set<Integer> set=new HashSet<>();
-            for(int archer:archers){
-
-                int enemyIdx=getEnemyIdx(n, points, archer, d);
-                if(enemyIdx<0)
+                Point enemy = getCloseEnemy(p, M, D, fields, visited);
+                if(enemy == null){
                     continue;
-
-                set.add(enemyIdx);
-            }
-
-            List<Integer> newList=new ArrayList<>(set);
-            Collections.sort(newList);
-
-            Iterator<Point> it = points.listIterator();
-            int idx=0; int removedIdx=0;
-
-            while(it.hasNext()){
-                Point p=it.next();
-
-                if(!newList.isEmpty() && removedIdx<newList.size() && idx==newList.get(removedIdx)){
-                    it.remove();
-                    removedIdx++;
-                } else{
-                    p.i+=1;
                 }
 
-                if(p.i==n)
-                    it.remove();
+                int enemyNumber = (enemy.i-1)*M+enemy.j;
 
-                idx++;
+                enemies.add(enemyNumber);
+                attackedEnemyThisTurn.add(enemy);
             }
 
-            cnt+=newList.size();
+            for(Point p:attackedEnemyThisTurn){
+                visited[p.i][p.j] = true;
+            }
         }
 
-        return cnt;
+        return enemies.size();
     }
 
-    private static int getEnemyIdx(int n, List<Point> points, int archer, int d){
-        int ans=-1;
-        PriorityQueue<Enemy> queue=new PriorityQueue<>();
+    static Point getCloseEnemy(Point arrow, int M, int D, int[][] fields, boolean[][] visited){
+        int left = arrow.j-D+1;
+        left = left<0?0:left;
 
-        for(int i=0;i<points.size();i++){
-            int dist=getDist(points.get(i), n, archer);
+        int right = arrow.j+D;
+        right = right>=M?M-1:right;
 
-            if(dist>d)
-                continue;
+        int up = arrow.i-D;
+        up = up<0?0:up;
 
-            queue.add(new Enemy(i, points.get(i).j, dist));
+        Point enemy = null;
+        int minDist = Integer.MAX_VALUE;
+        for(int i=arrow.i-1;i>=up;i--){
+            for(int j=left;j<=right;j++){
+                if(fields[i][j] == 0){
+                    continue;
+                }
+
+                if(visited[i][j]){
+                    continue;
+                }
+
+                Point p = new Point(i, j);
+                int dist = Point.calDist(arrow, new Point(i, j));
+
+                if(dist > D){
+                    continue;
+                }
+
+                if(minDist>dist){
+                    minDist = dist;
+                    enemy = p;
+                } else if (minDist == dist){
+                    if(enemy.j > p.j){
+                        enemy = p;
+                    }
+                }
+            }
         }
 
-        if(!queue.isEmpty())
-            ans=queue.poll().idx;
-
-        return ans;
+        return enemy;
     }
 
-    private static int getDist(Point point, int i, int j){
-        int di= point.i-i;
-        int dj=point.j-j;
-
-        di=(di<0)?di*-1:di;
-        dj=(dj<0)?dj*-1:dj;
-
-        return di+dj;
-    }
 }
