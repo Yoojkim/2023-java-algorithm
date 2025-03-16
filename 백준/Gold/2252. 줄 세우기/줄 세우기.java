@@ -1,54 +1,63 @@
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
 
-//DFS로 짜보기
-
-public class Main{
-    static Stack<Integer> stack=new Stack(); 
-    static LinkedList<Integer>[] nodes;
-    static boolean[] visited;
-    static StringBuilder sb=new StringBuilder();
-    public static void main(String[] args) throws Exception{
+public class Main {
+    public static void main(String[] args) throws Exception {
+        //nexts
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        String[] nums=br.readLine().split(" ");
-        int n=Integer.parseInt(nums[0]);
-        int m=Integer.parseInt(nums[1]);
-        
-        nodes=new LinkedList[n+1];
-        visited=new boolean[n+1];
-        for(int i=0;i<=n;i++){
-            nodes[i]=new LinkedList();
+
+        String[] inputs = br.readLine().split(" ");
+        int N = Integer.parseInt(inputs[0]);
+        int M = Integer.parseInt(inputs[1]);
+
+        List<Integer>[] nexts = new List[N+1];
+        int[] levels = new int[N+1]; //정점차수 기재
+        for(int i=1;i<=N;i++){
+            nexts[i] = new ArrayList<>();
         }
-        
-        for(int i=0;i<m;i++){
-            nums=br.readLine().split(" ");
-            int s1=Integer.parseInt(nums[0]); int s2=Integer.parseInt(nums[1]);
-            
-            LinkedList<Integer> node=nodes[s1];
-            node.addLast(s2);
+
+        while(M-->0){
+            inputs = br.readLine().split(" ");
+            int first = Integer.parseInt(inputs[0]);
+            int second = Integer.parseInt(inputs[1]);
+
+            levels[second]++;
+            nexts[first].add(second);
         }
-        
-        for(int i=1;i<=n;i++){
-            if(!visited[i])
-                dfsUtil(i);
+
+        Queue<Integer> queue = new ArrayDeque<>();
+
+        for(int i=1;i<=N;i++){
+            if(levels[i] == 0){
+                queue.add(i);
+            }
         }
-        
-        while(!stack.isEmpty()){
-            sb.append(stack.pop()).append(" ");
+
+        List<Integer> res = new ArrayList<>();
+        while(!queue.isEmpty()){
+            int now = queue.poll();
+
+            res.add(now);
+
+            for(int next:nexts[now]){
+                levels[next] --;
+
+                if(levels[next] == 0){
+                    queue.add(next);
+                }
+            }
         }
-        
-        System.out.println(sb);
-    }
-    
-    private static void dfsUtil(int s){
-        visited[s]=true;
-        
-        LinkedList<Integer> nears=nodes[s];
-        for(int near:nears){
-            if(!visited[near])
-                dfsUtil(near);
+
+        StringBuilder sb = new StringBuilder();
+
+        for(int r:res){
+            sb.append(r).append(" ");
         }
-        
-        stack.push(s);
+
+        System.out.print(sb);
     }
 }
