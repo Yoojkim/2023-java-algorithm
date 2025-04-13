@@ -1,50 +1,47 @@
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
-class Main{
-    public static void main(String[] args) throws Exception{
+public class Main {
+    public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
         String[] inputs = br.readLine().split(" ");
-
         int N = Integer.parseInt(inputs[0]);
         int H = Integer.parseInt(inputs[1]);
 
-        int[] tops = new int[H+1];
-        int[] bottoms = new int[H+1];
+        N /= 2;
+        int[] downSum = new int[H + 1];
+        int[] upSum = new int[H + 1];
+        for (int i = 0; i < N; i++) {
+            int down = Integer.parseInt(br.readLine());
+            int up = Integer.parseInt(br.readLine());
 
-        for(int i=1;i<=N/2;i++){
-            int bottom = Integer.parseInt(br.readLine());
-            int top = Integer.parseInt(br.readLine());
-
-            tops[top]++;
-            bottoms[bottom]++;
+            downSum[down]++;
+            upSum[H-up+1]++;
         }
 
         //누적합 계산
-        for(int i=H-1;i>0;i--){
-            tops[i] = tops[i+1] + tops[i];
+        for (int i = 1; i < H; i++) {
+            upSum[i + 1] += upSum[i];
         }
 
-        for(int i=H-1;i>0;i--){
-            bottoms[i] = bottoms[i+1]+bottoms[i];
+        for (int i = H; i > 1; i--) {
+            downSum[i - 1] += downSum[i];
         }
 
-        int min = Integer.MAX_VALUE; int cnt =0;
-        for(int i=1;i<=H;i++){
-            int res = bottoms[i] + tops[H-i+1];
-            if(res > min){
-                continue;
+
+        int min = Integer.MAX_VALUE;
+        int cnt = 0;
+        for (int i = 1; i <= H; i++) {
+            int sum = downSum[i] + upSum[i];
+            if (min > sum) {
+                min = sum;
+                cnt = 1;
+            } else if (min == sum) {
+                cnt++;
             }
-
-            if(res < min){
-                min = res;
-                cnt = 0;
-            }
-
-            cnt++;
         }
 
-        System.out.print(min+" "+cnt);
+        System.out.print(min + " " + cnt);
     }
 }
